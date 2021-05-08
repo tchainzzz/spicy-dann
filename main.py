@@ -34,7 +34,7 @@ def build_model(name, num_classes, num_domains):
 
 def get_wilds_dataset(name):
     dataset = get_dataset(dataset=name, root_dir=DATA_DIR, download=False)
-    logger.info("Loaded dataset {name} with {len(dataset)} examples")
+    logger.info(f"Loaded dataset {name} with {len(dataset)} examples")
     return dataset
 
 def get_split(dataset, split_name, transforms=None):
@@ -50,7 +50,7 @@ def train_step(iteration, model, train_loader, limit_batches=-1):
         if i == limit_batches:
             logger.warn(f"limit_batches set to {limit_batches}; early exit")
             break
-        y_pred = model(x)
+        y_pred = model(x) #TODO: apply mixup, but only to the domain reps?
         all_y_true += y_true
         all_y_pred += y_pred
         all_metadata += metadata
@@ -83,11 +83,20 @@ def evaluate(iteration, model, val_loader, limit_batches=-1):
     metrics = dataset.eval(all_y_pred, all_y_true, all_metadata)
     return metrics
 
+NUM_CLASSES = {
+    "camelyon17": 2,
+    "iwildcam": 10
+}
+NUM_DOMAINS = {
+    "camelyon17": 3,
+    "iwildcam": 10
+}
+
 if __name__ == '__main__':
     opts = options.get_opts()
     logger.info(f"Options:\n{options.prettyprint(opts)}")
     dataset = get_wilds_dataset(opts.dataset)
     train_loader, val_loader = get_split(dataset, 'train'), get_split(dataset, 'val')
-    model = build_model(opts.model_name)
+    model = build_model(opts.model_name, NUM_CLASSES[opts.dataset], NUM_DOMAINS[opts.dataset])
     metrics = train(train_loader, val_loader, model, opts.n_epochs, get_train_metrics=opts.get_train_metrics, save_every=opts.save_every, max_val_batches=opts.max_val_batches)
 
