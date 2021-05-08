@@ -9,6 +9,7 @@ import options
 import datetime
 import logging
 import time
+"""
 logger = logging.getLogger(__file__)
 logger.setLevel(logging.DEBUG)
 fmt = logging.Formatter("[%(levelname)s] %(asctime)s %(filename)s:%(lineno)d - %(message)s\n")
@@ -25,8 +26,10 @@ file_logger.setLevel(logging.DEBUG)
 file_logger.setFormatter(fmt)
 logger.addHandler(file_logger)
 logger.debug(f"Logging to {logfile}")
+"""
 
-DATA_DIR = "./WILDS"
+
+DATA_DIR = "~/Projects/WILDS"
 
 def build_model(name, num_classes, num_domains):
     model = DeepDANN(name, num_classes, num_domains)
@@ -34,7 +37,7 @@ def build_model(name, num_classes, num_domains):
 
 def get_wilds_dataset(name):
     dataset = get_dataset(dataset=name, root_dir=DATA_DIR, download=False)
-    logger.info(f"Loaded dataset {name} with {len(dataset)} examples")
+    #logger.info(f"Loaded dataset {name} with {len(dataset)} examples")
     return dataset
 
 def get_split(dataset, split_name, transforms=None):
@@ -43,44 +46,76 @@ def get_split(dataset, split_name, transforms=None):
         assert False, "Hi! You just tried to load a test split. This line of code is here to prevent you from shooting yourself in the foot. Comment this out to run on test."
     return dataset.get_subset(split_name, transform=transforms)
 
-def train_step(iteration, model, train_loader, limit_batches=-1):
+def train_step(iteration, model, train_loader, loss_class, loss_domain, optimizer, limit_batches=-1):
     model.train()
-    all_y_true, all_y_pred, all_metadata = [], [], []
+    all_class_true, all_class_pred, all_metadata, all_domain_pred = [], [], [], []
+    optimizer.zero_grad()
     for i, (x, y_true, metadata) in tqdm(enumerate(train_loader)):
         if i == limit_batches:
             logger.warn(f"limit_batches set to {limit_batches}; early exit")
             break
-        y_pred = model(x) #TODO: apply mixup, but only to the domain reps?
-        all_y_true += y_true
-        all_y_pred += y_pred
+        logits, domain_logits = model(x) #TODO: apply mixup, but only to the domain reps?
+        err_class = loss_class(logits, y_true)
+        err_domain = loss_domain(domain_logits, metadata)
+        err = err_class + err_domain
+        err.backward()
+        optimizer.step()
+        all_class_true += y_true
+        all_class_pred += logits
         all_metadata += metadata
-    return all_y_true, all_y_pred, all_metadata
+        all_domain_pred += domain_logits
+    return all_class_true, all_class_pred, all_metadata, all_domain_pred
 
 def train(train_loader, val_loader, model, n_epochs, get_train_metrics=True, save_every=5, max_val_batches=100):
+    # define loss function and optimizer
+    loss_class = torch.nn.NLLLoss()
+    loss_domain = torch.nn.NLLLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    #
+    for p in model.parameters():
+        p.requires_grad = True
+    # train the network
     metrics = []
     for i in range(n_epochs):
-        y_true, y_pred, metadata = train_step(i, model, train_loader)
+        all_class_true, all_class_pred, all_metadata, all_domain_pred = train_step(i, model, train_loader, loss_class, loss_domain, optimizer)
         if get_train_metrics:
-            train_metrics = dataset.eval(y_pred, y_true, metadata, limit_batches=max_val_batches)
+            #train_metrics = dataset.eval(y_pred, y_true, metadata, limit_batches=max_val_batches)
+            train_metrics = metric_eval(all_class_true, all_class_pred, all_metadata, all_domain_pred)
         val_metrics = evaluate(i, model, val_loader, limit_batches=max_val_batches)
         if i % save_every == 0:
-            torch.save() # TODO
+            torch.save(model.state_dict(), '~/Projects/spicy-dann') # TODO
         metrics.append(val_metrics if not get_train_metrics else (train_metrics, val_metrics))
     return metrics
 
+def metric_eval(all_class_true, all_class_pred, all_metadata, all_domain_pred):
+    class_acc = 0.0
+    domain_acc = 0.0
+    batch_size = all_class_true.shape[0]
+    total = 0
+    with torch.no_grad():
+        for index in range(batch_size):
+            total += all_class_true[index].shape[0]
+            class_acc += [all_class_true[index]==all_class_pred[index]].sum()
+            domain_acc += [all_metadata[index]==all_domain_pred[index]].sum()
+        class_acc /= total
+        domain_acc /= total
+    metrics = (class_acc, domain_acc)
+    return metrics
+
 def evaluate(iteration, model, val_loader, limit_batches=-1):
-    all_y_true, all_y_pred, all_metadata = [], [], []
+    all_class_true, all_class_pred, all_metadata, all_domain_pred = [], [], [], []
     model.eval()
     with torch.no_grad():
         for i, (x, y_true, metadata) in tqdm(enumerate(val_loader)):
             if i == limit_batches:
                 logger.warn(f"limit_batches set to {limit_batches}; early exit")
                 break
-        y_pred = model(x)
-        all_y_true += y_true
-        all_y_pred += y_pred
+        logits, domain_logits = model(x)
+        all_class_true += y_true
+        all_class_pred += logits
         all_metadata += metadata
-    metrics = dataset.eval(all_y_pred, all_y_true, all_metadata)
+        all_domain_pred += domain_logits
+    metrics = metric_eval(all_class_true, all_class_pred, all_metadata, all_domain_pred)
     return metrics
 
 NUM_CLASSES = {
@@ -93,11 +128,17 @@ NUM_DOMAINS = {
 }
 
 if __name__ == '__main__':
+    print('!!!! Get opts !!!!!\n')
     opts = options.get_opts()
-    logger.info(f"Options:\n{options.prettyprint(opts)}")
+    print('!!!! Logger !!!!!\n')
+    #logger.info(f"Options:\n{options.prettyprint(opts)}")
+    print('!!!! Get wilds dataset !!!!!\n')
     dataset = get_wilds_dataset(opts.dataset)
+    print('!!!! Datalodaer !!!!!\n')
     train_loader, val_loader = get_split(dataset, 'train'), get_split(dataset, 'val')
+    print('!!!! Build model !!!!!\n')
     model = build_model(opts.model_name, NUM_CLASSES[opts.dataset], NUM_DOMAINS[opts.dataset])
+    print('!!!! Train !!!!!\n')
     metrics = train(train_loader, val_loader, model, opts.n_epochs, get_train_metrics=opts.get_train_metrics, save_every=opts.save_every, max_val_batches=opts.max_val_batches)
 
-#########
+
