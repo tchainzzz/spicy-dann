@@ -2,6 +2,8 @@ import torch
 from tqdm.auto import tqdm
 from wilds import get_dataset
 
+from models import DeepDANN
+
 import options
 
 import datetime
@@ -26,8 +28,9 @@ logger.debug(f"Logging to {logfile}")
 
 DATA_DIR = "./WILDS"
 
-def build_model(name, use_dann=True, auxilliary_tasks=[]):
-    pass
+def build_model(name, num_classes, num_domains):
+    model = DeepDANN(name, num_classes, num_domains)
+    return model
 
 def get_wilds_dataset(name):
     dataset = get_dataset(dataset=name, root_dir=DATA_DIR, download=False)
