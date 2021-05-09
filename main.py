@@ -34,10 +34,11 @@ file_logger.setFormatter(fmt)
 logger.addHandler(file_logger)
 logger.debug(f"Logging to {logfile}")
 
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 def build_model(name, num_classes, num_domains, domain_task_weight, mixup_param):
     model = DeepDANN(name, num_classes, num_domains, alpha=domain_task_weight, beta=mixup_param)
-    return model
+    return model.to(device)
 
 def get_wilds_dataset(name, data_root):
     dataset = get_dataset(dataset=name, root_dir=data_root, download=False)
@@ -59,13 +60,23 @@ def train_step(iteration, model, train_loader, grouper, loss_class, loss_domain,
         if i == limit_batches:
             logger.warning(f"limit_batches set to {limit_batches}; early exit")
             break
-        raw_metadata = grouper.metadata_to_group(metadata)
-        domain_true = raw_metadata.topk(torch.unique(raw_metadata).numel()).indices # all domain labels are unique and can be deterministically ordered, so use topk
+        x = x.to(device)
+        y_true = y_true.to(device)
+        raw_metadata = grouper.metadata_to_group(metadata).to(device)
+        raw_domain = torch.unique(raw_metadata)
+        domain_values = raw_domain.topk(raw_domain.numel()).indices # all domain labels are unique and can be deterministically ordered, so use topk
+        domain_true = torch.zeros_like(y_true).to(device)
+        for old, new in zip(raw_domain, domain_values):
+            domain_true[raw_metadata == old] = new
+        
         output = model(x) #TODO: apply mixup, but only to the domain reps?
         #mixup_criterion(loss_domain, all_domain_pred, all_metadata, output.permutation, output.lam)
         err_class = loss_class(output.logits, y_true)
         err_domain = loss_domain(output.domain_logits, domain_true)
         err = err_class + err_domain
+        losses = {"cls/loss": err_class.item(), "dom/loss": err_domain.item(), "loss": err.item()}
+        log('train', losses)
+
         err.backward()
         optimizer.step()
         all_class_true += y_true
@@ -106,7 +117,10 @@ def train(train_loader, val_loader, model, grouper, n_epochs, get_train_metrics=
             torch.save(model.state_dict(), "./models/{run_name}_ep{i}_{human_readable_time}.ckpt")
     return metrics
 
+
 def compute_metrics(all_class_true, all_class_pred, all_domain_true=None, all_domain_pred=None, binary=False):
+    all_class_true = all_class_true.cpu().numpy()
+    all_class_pred = all_class_pred.cpu().numpy()
     class_acc = accuracy_score(all_class_true, all_class_pred)
     class_prec, class_rec, class_f1, *_ = precision_recall_fscore_support(all_class_true, all_class_pred, average='binary' if binary else 'macro')
     metrics = {
@@ -118,6 +132,8 @@ def compute_metrics(all_class_true, all_class_pred, all_domain_true=None, all_do
     }
 
     if all_domain_true is not None and all_domain_pred is not None:
+        all_domain_true = all_domain_true.cpu().numpy()
+        all_domain_pred = all_domain_pred.cpu().numpy()
         domain_acc = accuracy_score(all_domain_true, all_domain_pred)
         domain_prec, domain_rec, domain_f1, *_ = precision_recall_fscore_support(all_class_true, all_class_pred, average='macro')
         domain_metrics = {
@@ -131,7 +147,10 @@ def compute_metrics(all_class_true, all_class_pred, all_domain_true=None, all_do
 
 def evaluate(iteration, val_loader, model, grouper, limit_batches=-1, binary=False):
     all_class_true, all_class_pred = [], []
+
+    loss_class = torch.nn.NLLLoss()
     model.eval()
+    err_class = 0
     with torch.no_grad():
         pbar = tqdm(val_loader)
         pbar.set_description(f"Validating epoch {iteration+1}")
@@ -139,10 +158,14 @@ def evaluate(iteration, val_loader, model, grouper, limit_batches=-1, binary=Fal
             if i == limit_batches:
                 logger.warning(f"limit_batches set to {limit_batches}; early exit")
                 break
+            x = x.to(device)
+            y_true = y_true.to(device)
             output = model(x)
+            err_class += loss_class(output.logits, y_true)
             all_class_true += y_true
             class_preds = torch.max(output.logits, dim=-1).indices
             all_class_pred += class_preds
+    log('val', {"cls/loss": err_class.item() / len(val_loader)})
     metrics = compute_metrics(
         torch.stack(all_class_true, dim=0),
         torch.stack(all_class_pred, dim=0),

@@ -13,7 +13,7 @@ def get_opts():
     psr.add_argument("--get-train-metrics", action='store_true')
 
     psr.add_argument("--domain-task-weight", default=1., type=float)
-    psr.add_argument("--mixup-param", default=1, type=float)
+    psr.add_argument("--mixup-param", default=-1, type=float)
 
     # checkpointing
     psr.add_argument("--save-every", default=5, type=int)
