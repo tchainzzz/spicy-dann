@@ -244,8 +244,8 @@ if __name__ == '__main__':
     val_data = get_split(dataset, 'test', transforms=DEFAULT_TRANSFORM[opts.dataset])
 
     grouper = CombinatorialGrouper(dataset, [METADATA_KEYS[opts.dataset]])
-    train_loader = get_train_loader('group', train_data, batch_size=opts.batch_size, grouper=grouper, n_groups_per_batch=min(opts.batch_size, NUM_DOMAINS[opts.dataset]), num_workers=4, pin_memory=True)
-    val_loader = get_eval_loader('standard', val_data, batch_size=opts.batch_size, num_workers=4, pin_memory=True) # we don't care about test-time domain class.
+    train_loader = get_train_loader('group', train_data, batch_size=opts.batch_size, grouper=grouper, n_groups_per_batch=min(opts.batch_size, NUM_DOMAINS[opts.dataset]), num_workers=os.cpu_count(), pin_memory=True)
+    val_loader = get_eval_loader('standard', val_data, batch_size=opts.batch_size, num_workers=os.cpu_count(), pin_memory=True) # we don't care about test-time domain class.
     
     assert train_loader is not None
     assert val_loader is not None
