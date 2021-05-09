@@ -77,6 +77,7 @@ def train_step(iteration, model, train_loader, grouper, loss_class, loss_domain,
         domain_preds = torch.max(output.domain_logits, dim=-1).indices
         train_metrics = compute_metrics(y_true, class_preds, domain_true, domain_preds, binary=binary)
         log('train', train_metrics)
+        logger.debug(f"Logging validation metrics for epoch {iteration+1}, batch {i+1} of {len(train_loader)}: {dict_formatter(train_metrics)}")
         pbar.set_postfix(train_metrics)
     return all_class_true, all_class_logits, all_domain_true, all_domain_logits
 
@@ -99,6 +100,7 @@ def train(train_loader, val_loader, model, grouper, n_epochs, get_train_metrics=
         val_metrics = evaluate(i, val_loader, model, grouper, limit_batches=max_val_batches, binary=binary)
         log('val', val_metrics)
         print(f"Validation metrics: {dict_formatter(val_metrics)}")
+        logger.debug(f"Logging validation metrics for epoch {i+1}: {dict_formatter(val_metrics)}")
         metrics.append(val_metrics)
         if i % save_every == 0:
             torch.save(model.state_dict(), "./models/{run_name}_ep{i}_{human_readable_time}.ckpt")
