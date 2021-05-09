@@ -11,6 +11,7 @@ from wilds.common.grouper import CombinatorialGrouper
 from sklearn.metrics import precision_recall_fscore_support, accuracy_score
 
 from models import DeepDANN
+from mixup import mixup_criterion
 import options
 from utils import dict_formatter, DenseCrossEntropyLoss
 
@@ -75,9 +76,9 @@ def train_step(iteration, model, train_loader, grouper, loss_class, loss_domain,
             domain_true[raw_metadata == old] = new
         
         output = model(x) #TODO: apply mixup, but only to the domain reps?
-        #mixup_criterion(loss_domain, output.domain_logits, F.one_hot(domain_true), output.permutation, output.lam)
+        
         err_class = loss_class(output.logits, y_true)
-        err_domain = loss_domain(output.domain_logits, F.one_hot(domain_true))
+        err_domain = mixup_criterion(loss_domain, output.domain_logits, F.one_hot(domain_true), output.permutation, output.lam)
         err = err_class + err_domain
         losses = {"cls/loss": err_class.item(), "dom/loss": err_domain.item(), "loss": err.item()}
         log('train', losses)
@@ -125,7 +126,9 @@ def train(train_loader, val_loader, model, grouper, n_epochs, device='cuda' if t
         logger.debug(f"Logging validation metrics for epoch {i+1}: {dict_formatter(val_metrics)}")
         metrics.append(val_metrics)
         if i % save_every == 0:
-            torch.save(model.state_dict(), "./models/{run_name}_ep{i}_{human_readable_time}.ckpt")
+            checkpoint_path = "./models/{run_name}_ep{i}_{human_readable_time}.ckpt"
+            print(f"Saving checkpoint to {checkpoint_path}")
+            torch.save(model.state_dict(), checkpoint_path)
     return metrics
 
 

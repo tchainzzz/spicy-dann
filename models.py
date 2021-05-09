@@ -4,7 +4,7 @@ import torch.nn as nn
 import torchvision
 
 from dann.functions import ReverseLayerF
-from mixup import mixup_data, mixup_criterion
+from mixup import mixup_data
 
 from dataclasses import dataclass
 

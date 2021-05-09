@@ -16,7 +16,7 @@ def get_opts():
     psr.add_argument("--mixup-param", default=-1, type=float)
 
     # checkpointing
-    psr.add_argument("--save-every", default=5, type=int)
+    psr.add_argument("--save-every", default=1, type=int)
     psr.add_argument("--run-name", type=str, required=True)
 
     # debugging
