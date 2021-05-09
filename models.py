@@ -11,9 +11,11 @@ from dataclasses import dataclass
 @dataclass
 class MixupModelOutput:
     logits: torch.Tensor
-    domain_logits: torch.Tensor
-    permutation: torch.Tensor
-    lam: float
+    domain_logits: torch.Tensor = None
+    permutation: torch.Tensor = None
+    lam: float = None
+
+
 class MixUpDomainClassifier(nn.Module):
     def __init__(self, in_size, n_classes, fc_size=(1024, 1024), alpha=0.1, beta=1, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -26,7 +28,7 @@ class MixUpDomainClassifier(nn.Module):
             self.layers.append(nn.Linear(in_features, out_features))
         self.layers.append(nn.Linear(fc_size[-1], n_classes))
 
-    def forward(self, X, y):
+    def forward(self, X):
         if self.beta > 0:
             lam = np.random.beta(self.beta, self.beta)
         else:
@@ -38,30 +40,34 @@ class MixUpDomainClassifier(nn.Module):
         return X, permutation, lam
 
 class DeepDANN(nn.Module):
-    def __init__(self, model_name, num_classes, num_domains, alpha=0.1, pretrained=True, *args, **kwargs):
+    def __init__(self, model_name, num_classes, num_domains, alpha=0.1, beta=-1, pretrained=True, *args, **kwargs):
         super().__init__(*args, **kwargs)
         model = getattr(torchvision.models, model_name)(pretrained=pretrained)
+        self.alpha = alpha
+        self.beta = beta
         if model_name.startswith('resnet'):
             num_ftrs = model.fc.in_features
             self.classifier = nn.Linear(num_ftrs, num_classes)
             model.fc = Identity()
             self.feature_extractor = model
-            self.domain_discriminator = MixUpDomainClassifier(num_ftrs, num_domains, alpha=alpha)
+            self.domain_discriminator = MixUpDomainClassifier(num_ftrs, num_domains, alpha=alpha, beta=beta)
         elif model_name.startswith('densenet'):
             num_ftrs = model.classifier.in_features
             self.classifier = nn.Linear(num_ftrs, num_classes)
             model.classifier = Identity()
             self.feature_extractor = model
-            self.domain_discriminator = MixUpDomainClassifier(num_ftrs, num_domains, alpha=alpha)
+            self.domain_discriminator = MixUpDomainClassifier(num_ftrs, num_domains, alpha=alpha, beta=beta)
         else:
             raise NotImplementedError()
 
     def forward(self, X):
         feats = self.feature_extractor(X)
         logits = self.classifier(feats)
-        domain_logits, permutation, lam = self.domain_discriminator(feats)
-        return MixupModelOutput(logits, domain_logits, permutation, lam)
-        
+        if self.training:
+            domain_logits, permutation, lam = self.domain_discriminator(feats)
+            return MixupModelOutput(logits, domain_logits, permutation, lam)
+        else:
+            return MixupModelOutput(logits)
 class Identity(nn.Module): # utility for deleting layers
     def __init__(self):
         super(Identity, self).__init__()

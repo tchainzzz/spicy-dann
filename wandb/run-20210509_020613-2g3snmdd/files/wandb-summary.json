@@ -1,0 +1,1 @@
+{"train/cls/acc": 0.6666666666666666, "_runtime": 22, "_timestamp": 1620551195, "_step": 15, "train/dom/acc": 0.3333333333333333, "train/cls/prec": 0.5, "train/cls/rec": 1.0, "train/cls/f1": 0.6666666666666666, "train/dom/prec": 0.75, "train/dom/rec": 0.75, "train/dom/f1": 0.6666666666666666}

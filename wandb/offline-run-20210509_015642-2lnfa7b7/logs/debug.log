@@ -1,0 +1,26 @@
+2021-05-09 01:56:42,522 INFO    MainThread:27325 [wandb_setup.py:_flush():69] setting env: {}
+2021-05-09 01:56:42,522 INFO    MainThread:27325 [wandb_init.py:_log_setup():336] Logging user logs to /home/trenton-windows/repos/spicy-dann/wandb/offline-run-20210509_015642-2lnfa7b7/logs/debug.log
+2021-05-09 01:56:42,522 INFO    MainThread:27325 [wandb_init.py:_log_setup():337] Logging internal logs to /home/trenton-windows/repos/spicy-dann/wandb/offline-run-20210509_015642-2lnfa7b7/logs/debug-internal.log
+2021-05-09 01:56:42,523 INFO    MainThread:27325 [wandb_init.py:init():369] calling init triggers
+2021-05-09 01:56:42,523 INFO    MainThread:27325 [wandb_init.py:init():376] wandb.init called with sweep_config: {}
+config: {}
+2021-05-09 01:56:42,523 INFO    MainThread:27325 [wandb_init.py:init():418] starting backend
+2021-05-09 01:56:42,523 INFO    MainThread:27325 [backend.py:_multiprocessing_setup():72] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2021-05-09 01:56:42,534 INFO    MainThread:27325 [backend.py:ensure_launched():132] starting backend process...
+2021-05-09 01:56:42,546 INFO    MainThread:27325 [backend.py:ensure_launched():137] started backend process with pid: 27350
+2021-05-09 01:56:42,552 INFO    MainThread:27325 [wandb_init.py:init():423] backend started and connected
+2021-05-09 01:56:42,554 INFO    MainThread:27325 [wandb_init.py:init():465] updated telemetry
+2021-05-09 01:56:42,561 INFO    MainThread:27325 [wandb_init.py:init():522] starting run threads in backend
+2021-05-09 01:56:46,067 INFO    MainThread:27325 [wandb_run.py:_console_start():1565] atexit reg
+2021-05-09 01:56:46,067 INFO    MainThread:27325 [wandb_run.py:_redirect():1412] redirect: SettingsConsole.REDIRECT
+2021-05-09 01:56:46,068 INFO    MainThread:27325 [wandb_run.py:_redirect():1417] Redirecting console.
+2021-05-09 01:56:46,070 INFO    MainThread:27325 [wandb_run.py:_redirect():1479] Redirects installed.
+2021-05-09 01:56:46,070 INFO    MainThread:27325 [wandb_init.py:init():546] run started, returning control to user process
+2021-05-09 01:56:46,071 INFO    MainThread:27325 [wandb_run.py:_config_callback():787] config_cb None None {'dataset': 'camelyon17', 'data_root': './WILDS', 'model_name': 'resnet18', 'batch_size': 3, 'n_epochs': 1, 'get_train_metrics': True, 'save_every': 5, 'run_name': 'dev-small', 'max_val_batches': 2}
+2021-05-09 01:56:46,075 INFO    MainThread:27325 [wandb_run.py:_atexit_cleanup():1535] got exitcode: 1
+2021-05-09 01:56:46,076 INFO    MainThread:27325 [wandb_run.py:_restore():1507] restore
+2021-05-09 01:56:48,084 INFO    MainThread:27325 [wandb_run.py:_wait_for_finish():1657] got exit ret: 
+2021-05-09 01:56:48,187 INFO    MainThread:27325 [wandb_run.py:_wait_for_finish():1657] got exit ret: done: true
+exit_result {
+}
+

@@ -1,0 +1,639 @@
+diff --git a/.gitignore b/.gitignore
+index 4dab6d8..c26d9ad 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,5 +1,8 @@
+ WILDS/*
+ logs/*
+ __pycache__/
++models/*
++.idea/
++
+ 
+ *.*.sw*
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+deleted file mode 100644
+index a2e120d..0000000
+--- a/.idea/misc.xml
++++ /dev/null
+@@ -1,4 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project version="4">
+-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.7" project-jdk-type="Python SDK" />
+-</project>
+\ No newline at end of file
+diff --git a/.idea/modules.xml b/.idea/modules.xml
+deleted file mode 100644
+index 9cf239c..0000000
+--- a/.idea/modules.xml
++++ /dev/null
+@@ -1,8 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project version="4">
+-  <component name="ProjectModuleManager">
+-    <modules>
+-      <module fileurl="file://$PROJECT_DIR$/.idea/spicy-dann.iml" filepath="$PROJECT_DIR$/.idea/spicy-dann.iml" />
+-    </modules>
+-  </component>
+-</project>
+\ No newline at end of file
+diff --git a/.idea/spicy-dann.iml b/.idea/spicy-dann.iml
+deleted file mode 100644
+index 6711606..0000000
+--- a/.idea/spicy-dann.iml
++++ /dev/null
+@@ -1,11 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<module type="PYTHON_MODULE" version="4">
+-  <component name="NewModuleRootManager">
+-    <content url="file://$MODULE_DIR$" />
+-    <orderEntry type="inheritedJdk" />
+-    <orderEntry type="sourceFolder" forTests="false" />
+-  </component>
+-  <component name="TestRunnerService">
+-    <option name="PROJECT_TEST_RUNNER" value="Unittests" />
+-  </component>
+-</module>
+\ No newline at end of file
+diff --git a/.idea/vcs.xml b/.idea/vcs.xml
+deleted file mode 100644
+index 94a25f7..0000000
+--- a/.idea/vcs.xml
++++ /dev/null
+@@ -1,6 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project version="4">
+-  <component name="VcsDirectoryMappings">
+-    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+-  </component>
+-</project>
+\ No newline at end of file
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+deleted file mode 100644
+index 20d7690..0000000
+--- a/.idea/workspace.xml
++++ /dev/null
+@@ -1,223 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project version="4">
+-  <component name="ChangeListManager">
+-    <list default="true" id="519e8dd6-064c-4959-b6bf-b628c9be348b" name="Default Changelist" comment="">
+-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+-    </list>
+-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+-    <option name="SHOW_DIALOG" value="false" />
+-    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+-    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+-    <option name="LAST_RESOLUTION" value="IGNORE" />
+-  </component>
+-  <component name="FileEditorManager">
+-    <leaf>
+-      <file pinned="false" current-in-tab="true">
+-        <entry file="file://$PROJECT_DIR$/main.py">
+-          <provider selected="true" editor-type-id="text-editor">
+-            <state relative-caret-position="146">
+-              <caret line="133" column="5" selection-start-line="133" selection-start-column="5" selection-end-line="133" selection-end-column="5" />
+-              <folding>
+-                <element signature="e#0#12#0" expanded="true" />
+-              </folding>
+-            </state>
+-          </provider>
+-        </entry>
+-      </file>
+-      <file pinned="false" current-in-tab="false">
+-        <entry file="file://$PROJECT_DIR$/mixup.py">
+-          <provider selected="true" editor-type-id="text-editor">
+-            <state>
+-              <folding>
+-                <element signature="e#0#18#0" expanded="true" />
+-              </folding>
+-            </state>
+-          </provider>
+-        </entry>
+-      </file>
+-      <file pinned="false" current-in-tab="false">
+-        <entry file="file://$PROJECT_DIR$/models.py">
+-          <provider selected="true" editor-type-id="text-editor">
+-            <state relative-caret-position="637">
+-              <caret line="38" column="13" lean-forward="true" selection-start-line="38" selection-start-column="13" selection-end-line="38" selection-end-column="13" />
+-              <folding>
+-                <element signature="e#0#21#0" expanded="true" />
+-              </folding>
+-            </state>
+-          </provider>
+-        </entry>
+-      </file>
+-      <file pinned="false" current-in-tab="false">
+-        <entry file="file://$PROJECT_DIR$/options.py">
+-          <provider selected="true" editor-type-id="text-editor" />
+-        </entry>
+-      </file>
+-    </leaf>
+-  </component>
+-  <component name="FindInProjectRecents">
+-    <findStrings>
+-      <find>logging</find>
+-      <find>torch</find>
+-    </findStrings>
+-  </component>
+-  <component name="Git.Settings">
+-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+-  </component>
+-  <component name="IdeDocumentHistory">
+-    <option name="CHANGED_PATHS">
+-      <list>
+-        <option value="$PROJECT_DIR$/main.py" />
+-      </list>
+-    </option>
+-  </component>
+-  <component name="ProjectConfigurationFiles">
+-    <option name="files">
+-      <list>
+-        <option value="$PROJECT_DIR$/.idea/spicy-dann.iml" />
+-        <option value="$PROJECT_DIR$/.idea/misc.xml" />
+-        <option value="$PROJECT_DIR$/.idea/vcs.xml" />
+-        <option value="$PROJECT_DIR$/.idea/modules.xml" />
+-      </list>
+-    </option>
+-  </component>
+-  <component name="ProjectFrameBounds" fullScreen="true">
+-    <option name="width" value="1280" />
+-    <option name="height" value="800" />
+-  </component>
+-  <component name="ProjectView">
+-    <navigator proportions="" version="1">
+-      <foldersAlwaysOnTop value="true" />
+-    </navigator>
+-    <panes>
+-      <pane id="Scope" />
+-      <pane id="ProjectPane">
+-        <subPane>
+-          <expand>
+-            <path>
+-              <item name="spicy-dann" type="b2602c69:ProjectViewProjectNode" />
+-              <item name="spicy-dann" type="462c0819:PsiDirectoryNode" />
+-            </path>
+-            <path>
+-              <item name="spicy-dann" type="b2602c69:ProjectViewProjectNode" />
+-              <item name="spicy-dann" type="462c0819:PsiDirectoryNode" />
+-              <item name="DANN_py3" type="462c0819:PsiDirectoryNode" />
+-            </path>
+-          </expand>
+-          <select />
+-        </subPane>
+-      </pane>
+-    </panes>
+-  </component>
+-  <component name="PropertiesComponent">
+-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+-  </component>
+-  <component name="RunDashboard">
+-    <option name="ruleStates">
+-      <list>
+-        <RuleState>
+-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+-        </RuleState>
+-        <RuleState>
+-          <option name="name" value="StatusDashboardGroupingRule" />
+-        </RuleState>
+-      </list>
+-    </option>
+-  </component>
+-  <component name="SvnConfiguration">
+-    <configuration />
+-  </component>
+-  <component name="TaskManager">
+-    <task active="true" id="Default" summary="Default task">
+-      <changelist id="519e8dd6-064c-4959-b6bf-b628c9be348b" name="Default Changelist" comment="" />
+-      <created>1620499586221</created>
+-      <option name="number" value="Default" />
+-      <option name="presentableId" value="Default" />
+-      <updated>1620499586221</updated>
+-    </task>
+-    <servers />
+-  </component>
+-  <component name="ToolWindowManager">
+-    <frame x="0" y="0" width="1280" height="800" extended-state="0" />
+-    <editor active="true" />
+-    <layout>
+-      <window_info id="Favorites" side_tool="true" />
+-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17156473" />
+-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+-      <window_info anchor="bottom" id="Version Control" />
+-      <window_info anchor="bottom" id="Python Console" />
+-      <window_info active="true" anchor="bottom" id="Terminal" visible="true" weight="0.38219178" />
+-      <window_info anchor="bottom" id="Event Log" side_tool="true" />
+-      <window_info anchor="bottom" id="Message" order="0" />
+-      <window_info anchor="bottom" id="Find" order="1" />
+-      <window_info anchor="bottom" id="Run" order="2" />
+-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+-      <window_info anchor="bottom" id="TODO" order="6" />
+-      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+-    </layout>
+-  </component>
+-  <component name="editorHistoryManager">
+-    <entry file="file://$PROJECT_DIR$/options.py">
+-      <provider selected="true" editor-type-id="text-editor" />
+-    </entry>
+-    <entry file="file://$PROJECT_DIR$/__init__.py">
+-      <provider selected="true" editor-type-id="text-editor" />
+-    </entry>
+-    <entry file="file://$PROJECT_DIR$/requirements.txt">
+-      <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="102">
+-          <caret line="6" column="36" selection-start-line="6" selection-start-column="36" selection-end-line="6" selection-end-column="36" />
+-        </state>
+-      </provider>
+-    </entry>
+-    <entry file="file://$PROJECT_DIR$/DANN_py3/data_loader.py">
+-      <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="187">
+-          <caret line="11" column="32" selection-start-line="11" selection-start-column="32" selection-end-line="11" selection-end-column="32" />
+-          <folding>
+-            <element signature="e#0#31#0" expanded="true" />
+-          </folding>
+-        </state>
+-      </provider>
+-    </entry>
+-    <entry file="file://$PROJECT_DIR$/mixup.py">
+-      <provider selected="true" editor-type-id="text-editor">
+-        <state>
+-          <folding>
+-            <element signature="e#0#18#0" expanded="true" />
+-          </folding>
+-        </state>
+-      </provider>
+-    </entry>
+-    <entry file="file://$PROJECT_DIR$/models.py">
+-      <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="637">
+-          <caret line="38" column="13" lean-forward="true" selection-start-line="38" selection-start-column="13" selection-end-line="38" selection-end-column="13" />
+-          <folding>
+-            <element signature="e#0#21#0" expanded="true" />
+-          </folding>
+-        </state>
+-      </provider>
+-    </entry>
+-    <entry file="file://$USER_HOME$/miniconda3/envs/WILDS/lib/python3.7/logging/__init__.py">
+-      <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="142">
+-          <caret line="1086" selection-start-line="1086" selection-end-line="1086" />
+-        </state>
+-      </provider>
+-    </entry>
+-    <entry file="file://$PROJECT_DIR$/main.py">
+-      <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="146">
+-          <caret line="133" column="5" selection-start-line="133" selection-start-column="5" selection-end-line="133" selection-end-column="5" />
+-          <folding>
+-            <element signature="e#0#12#0" expanded="true" />
+-          </folding>
+-        </state>
+-      </provider>
+-    </entry>
+-  </component>
+-</project>
+\ No newline at end of file
+diff --git a/__pycache__/main.cpython-37.pyc b/__pycache__/main.cpython-37.pyc
+index f75736e..373aa53 100644
+Binary files a/__pycache__/main.cpython-37.pyc and b/__pycache__/main.cpython-37.pyc differ
+diff --git a/__pycache__/options.cpython-37.pyc b/__pycache__/options.cpython-37.pyc
+index bb9b4c4..73d1304 100644
+Binary files a/__pycache__/options.cpython-37.pyc and b/__pycache__/options.cpython-37.pyc differ
+diff --git a/main.py b/main.py
+index 2dd5858..b07cdeb 100644
+--- a/main.py
++++ b/main.py
+@@ -1,15 +1,19 @@
+ import torch
++import torchvision.transforms as transforms
+ from tqdm.auto import tqdm
++import wandb
+ from wilds import get_dataset
++from wilds.common.data_loaders import get_train_loader, get_eval_loader
++from wilds.common.grouper import CombinatorialGrouper
+ 
+ from models import DeepDANN
+-
+ import options
+ 
+ import datetime
+ import logging
++import os
+ import time
+-"""
++
+ logger = logging.getLogger(__file__)
+ logger.setLevel(logging.DEBUG)
+ fmt = logging.Formatter("[%(levelname)s] %(asctime)s %(filename)s:%(lineno)d - %(message)s\n")
+@@ -26,18 +30,15 @@ file_logger.setLevel(logging.DEBUG)
+ file_logger.setFormatter(fmt)
+ logger.addHandler(file_logger)
+ logger.debug(f"Logging to {logfile}")
+-"""
+-
+ 
+-DATA_DIR = "~/Projects/WILDS"
+ 
+ def build_model(name, num_classes, num_domains):
+     model = DeepDANN(name, num_classes, num_domains)
+     return model
+ 
+-def get_wilds_dataset(name):
+-    dataset = get_dataset(dataset=name, root_dir=DATA_DIR, download=False)
+-    #logger.info(f"Loaded dataset {name} with {len(dataset)} examples")
++def get_wilds_dataset(name, data_root):
++    dataset = get_dataset(dataset=name, root_dir=data_root, download=False)
++    logger.info(f"Loaded dataset {name} with {len(dataset)} examples")
+     return dataset
+ 
+ def get_split(dataset, split_name, transforms=None):
+@@ -45,8 +46,7 @@ def get_split(dataset, split_name, transforms=None):
+     if split_name == 'test':
+         assert False, "Hi! You just tried to load a test split. This line of code is here to prevent you from shooting yourself in the foot. Comment this out to run on test."
+     return dataset.get_subset(split_name, transform=transforms)
+-
+-def train_step(iteration, model, train_loader, loss_class, loss_domain, optimizer, limit_batches=-1):
++def train_step(iteration, model, train_loader, grouper, loss_class, loss_domain, optimizer, limit_batches=-1):
+     model.train()
+     all_class_true, all_class_pred, all_metadata, all_domain_pred = [], [], [], []
+     optimizer.zero_grad()
+@@ -54,37 +54,43 @@ def train_step(iteration, model, train_loader, loss_class, loss_domain, optimize
+         if i == limit_batches:
+             logger.warn(f"limit_batches set to {limit_batches}; early exit")
+             break
+-        logits, domain_logits = model(x) #TODO: apply mixup, but only to the domain reps?
+-        err_class = loss_class(logits, y_true)
+-        err_domain = loss_domain(domain_logits, metadata)
++        raw_metadata = grouper.metadata_to_group(metadata)
++        domain_true = raw_metadata.topk(torch.unique(raw_metadata).numel()).indices # all domain labels are unique and can be deterministically ordered, so use topk
++        output = model(x) #TODO: apply mixup, but only to the domain reps?
++        #mixup_criterion(loss_domain, all_domain_pred, all_metadata, output.permutation, output.lam)
++        err_class = loss_class(output.logits, y_true)
++        err_domain = loss_domain(output.domain_logits, domain_true)
+         err = err_class + err_domain
+         err.backward()
+         optimizer.step()
+         all_class_true += y_true
+-        all_class_pred += logits
++        all_class_pred += output.logits
+         all_metadata += metadata
+-        all_domain_pred += domain_logits
++        all_domain_pred += output.domain_logits
+     return all_class_true, all_class_pred, all_metadata, all_domain_pred
+ 
+-def train(train_loader, val_loader, model, n_epochs, get_train_metrics=True, save_every=5, max_val_batches=100):
+-    # define loss function and optimizer
++
++def train(train_loader, val_loader, model, grouper, n_epochs, get_train_metrics=True, save_every=5, max_val_batches=100):
++    # define loss function and optimizer # TODO: command-line-ify this
+     loss_class = torch.nn.NLLLoss()
+     loss_domain = torch.nn.NLLLoss()
+-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
++    #optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
++    optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+     #
+     for p in model.parameters():
+         p.requires_grad = True
+     # train the network
+     metrics = []
+     for i in range(n_epochs):
+-        all_class_true, all_class_pred, all_metadata, all_domain_pred = train_step(i, model, train_loader, loss_class, loss_domain, optimizer)
++        import pdb; pdb.set_trace()
++        all_class_true, all_class_pred, all_metadata, all_domain_pred = train_step(i, model, train_loader, grouper, loss_class, loss_domain, optimizer)
+         if get_train_metrics:
+-            #train_metrics = dataset.eval(y_pred, y_true, metadata, limit_batches=max_val_batches)
++            train_metrics = dataset.eval(all_class_pred, all_class_true, all_metadata, limit_batches=max_val_batches)
+             train_metrics = metric_eval(all_class_true, all_class_pred, all_metadata, all_domain_pred)
+         val_metrics = evaluate(i, model, val_loader, limit_batches=max_val_batches)
+-        if i % save_every == 0:
+-            torch.save(model.state_dict(), '~/Projects/spicy-dann') # TODO
+         metrics.append(val_metrics if not get_train_metrics else (train_metrics, val_metrics))
++        if i % save_every == 0:
++            torch.save(model.state_dict(), "./models/{run_name}_ep{i}_{human_readable_time}.ckpt")
+     return metrics
+ 
+ def metric_eval(all_class_true, all_class_pred, all_metadata, all_domain_pred):
+@@ -102,7 +108,7 @@ def metric_eval(all_class_true, all_class_pred, all_metadata, all_domain_pred):
+     metrics = (class_acc, domain_acc)
+     return metrics
+ 
+-def evaluate(iteration, model, val_loader, limit_batches=-1):
++def evaluate(iteration, model, val_loader, grouper, limit_batches=-1):
+     all_class_true, all_class_pred, all_metadata, all_domain_pred = [], [], [], []
+     model.eval()
+     with torch.no_grad():
+@@ -110,35 +116,53 @@ def evaluate(iteration, model, val_loader, limit_batches=-1):
+             if i == limit_batches:
+                 logger.warn(f"limit_batches set to {limit_batches}; early exit")
+                 break
+-        logits, domain_logits = model(x)
++        output = model(x)
+         all_class_true += y_true
+-        all_class_pred += logits
++        all_class_pred += output.logits
+         all_metadata += metadata
+-        all_domain_pred += domain_logits
++        all_domain_pred += output.domain_logits
++    metrics = dataset.eval(all_class_pred, all_class_true, all_metadata)
+     metrics = metric_eval(all_class_true, all_class_pred, all_metadata, all_domain_pred)
+     return metrics
+ 
+ NUM_CLASSES = {
+     "camelyon17": 2,
+-    "iwildcam": 10
++    "iwildcam": 182
+ }
++
+ NUM_DOMAINS = {
+     "camelyon17": 3,
+-    "iwildcam": 10
++    "iwildcam": 243
++}
++
++METADATA_KEYS = { # what domain SHIFT are we trying to model?
++    "camelyon17": "hospital",
++    "iwildcam": "location"
+ }
+ 
++DEFAULT_TRANSFORM = transforms.Compose(
++    [
++        transforms.Resize((224, 224)),
++        transforms.ToTensor()
++    ]
++)
++
+ if __name__ == '__main__':
+-    print('!!!! Get opts !!!!!\n')
+     opts = options.get_opts()
+-    print('!!!! Logger !!!!!\n')
+-    #logger.info(f"Options:\n{options.prettyprint(opts)}")
+-    print('!!!! Get wilds dataset !!!!!\n')
+-    dataset = get_wilds_dataset(opts.dataset)
+-    print('!!!! Datalodaer !!!!!\n')
+-    train_loader, val_loader = get_split(dataset, 'train'), get_split(dataset, 'val')
+-    print('!!!! Build model !!!!!\n')
++    logger.info(f"Options:\n{options.prettyprint(opts)}")
++    print(f"Loading dataset {opts.dataset} from {opts.data_root}")
++    dataset = get_wilds_dataset(opts.dataset, opts.data_root)
++    print('Setting up dataloader')
++    grouper = CombinatorialGrouper(dataset, [METADATA_KEYS[opts.dataset]])
++    train_data = get_split(dataset, 'train', transforms=DEFAULT_TRANSFORM)
++    val_data = get_split(dataset, 'val', transforms=DEFAULT_TRANSFORM)
++    train_loader = get_train_loader('group', train_data, batch_size=opts.batch_size, grouper=grouper, n_groups_per_batch=min(opts.batch_size, NUM_DOMAINS[opts.dataset]))
++    val_loader = get_eval_loader('group', val_data, batch_size=opts.batch_size, grouper=grouper, n_groups_per_batch=min(opts.batch_size, NUM_DOMAINS[opts.dataset]))
++    print(f'Build model of type {opts.model_name}')
+     model = build_model(opts.model_name, NUM_CLASSES[opts.dataset], NUM_DOMAINS[opts.dataset])
+-    print('!!!! Train !!!!!\n')
+-    metrics = train(train_loader, val_loader, model, opts.n_epochs, get_train_metrics=opts.get_train_metrics, save_every=opts.save_every, max_val_batches=opts.max_val_batches)
+-
+ 
++    print("Configuring training")
++    wandb.init(project='deep-domain-mixup', entity='tchainzzz', name=opts.run_name)
++    wandb.config.update(vars(opts))
++    metrics = train(train_loader, val_loader, model, grouper, opts.n_epochs, get_train_metrics=opts.get_train_metrics, save_every=opts.save_every, max_val_batches=opts.max_val_batches)
++    torch.save(model.state_dict(), "./models/{opts.run_name}_final_{human_readable_time}.pth")
+diff --git a/mixup.py b/mixup.py
+index 71128ac..e3105f0 100644
+--- a/mixup.py
++++ b/mixup.py
+@@ -1,13 +1,7 @@
+ import numpy as np
+ import torch
+ 
+-def mixup_data(x, y, alpha=1.0, use_cuda=True):
+-    '''Returns mixed inputs, pairs of targets, and lambda'''
+-    if alpha > 0:
+-        lam = np.random.beta(alpha, alpha)
+-    else:
+-        lam = 1
+-
++def mixup_data(x, lam, use_cuda=True):
+     batch_size = x.size(0)
+     if use_cuda:
+         index = torch.randperm(batch_size).cuda()
+@@ -15,9 +9,9 @@ def mixup_data(x, y, alpha=1.0, use_cuda=True):
+         index = torch.randperm(batch_size)
+ 
+     mixed_x = lam * x + (1 - lam) * x[index, :]
+-    y_a, y_b = y, y[index]
+-    return mixed_x, y_a, y_b, lam
++    return mixed_x, index, lam
+ 
+ 
+-def mixup_criterion(criterion, pred, y_a, y_b, lam):
+-    return lam * criterion(pred, y_a) + (1 - lam) * criterion(pred, y_b)
++def mixup_criterion(criterion, pred, y, permutation, lam):
++    y_mix = y[permutation]
++    return lam * criterion(pred, y) + (1 - lam) * criterion(pred, y_mix)
+diff --git a/models.py b/models.py
+index afbb354..faa86eb 100644
+--- a/models.py
++++ b/models.py
+@@ -1,12 +1,24 @@
++import numpy as np
++import torch
+ import torch.nn as nn
+ import torchvision
+ 
+ from dann.functions import ReverseLayerF
++from mixup import mixup_data, mixup_criterion
+ 
+-class DomainClassifier(nn.Module):
+-    def __init__(self, in_size, n_classes, fc_size=(1024, 1024), alpha=0.1, *args, **kwargs):
++from dataclasses import dataclass
++
++@dataclass
++class MixupModelOutput:
++    logits: torch.Tensor
++    domain_logits: torch.Tensor
++    permutation: torch.Tensor
++    lam: float
++class MixUpDomainClassifier(nn.Module):
++    def __init__(self, in_size, n_classes, fc_size=(1024, 1024), alpha=0.1, beta=1, *args, **kwargs):
+         super().__init__(*args, **kwargs)
+-        self.alpha = alpha
++        self.alpha = alpha # domain class. weight
++        self.beta = beta # mixup distribution
+         self.layers = nn.ModuleList()
+         for i, size in enumerate(fc_size):
+             in_features = fc_size[i - 1] if i > 0 else in_size
+@@ -15,10 +27,15 @@ class DomainClassifier(nn.Module):
+         self.layers.append(nn.Linear(fc_size[-1], n_classes))
+ 
+     def forward(self, X):
++        if self.beta > 0:
++            lam = np.random.beta(self.beta, self.beta)
++        else:
++            lam = 1
++        X, permutation, lam = mixup_data(X, lam)
+         X = ReverseLayerF.apply(X, self.alpha)
+         for layer in self.layers:
+             X = layer(X)
+-        return X
++        return X, permutation, lam
+ 
+ class DeepDANN(nn.Module):
+     def __init__(self, model_name, num_classes, num_domains, alpha=0.1, pretrained=True, *args, **kwargs):
+@@ -29,21 +46,21 @@ class DeepDANN(nn.Module):
+             self.classifier = nn.Linear(num_ftrs, num_classes)
+             model.fc = Identity()
+             self.feature_extractor = model
+-            self.domain_discriminator = DomainClassifier(num_ftrs, num_domains, alpha=alpha)
++            self.domain_discriminator = MixUpDomainClassifier(num_ftrs, num_domains, alpha=alpha)
+         elif model_name.startswith('densenet'):
+             num_ftrs = model.classifier.in_features
+             self.classifier = nn.Linear(num_ftrs, num_classes)
+             model.classifier = Identity()
+             self.feature_extractor = model
+-            self.domain_discriminator = DomainClassifier(num_ftrs, num_domains, alpha=alpha)
++            self.domain_discriminator = MixUpDomainClassifier(num_ftrs, num_domains, alpha=alpha)
+         else:
+             raise NotImplementedError()
+ 
+     def forward(self, X):
+         feats = self.feature_extractor(X)
+         logits = self.classifier(feats)
+-        domain_logits = self.domain_discriminator(feats)
+-        return logits, domain_logits        
++        domain_logits, permutation, lam = self.domain_discriminator(feats)
++        return MixupModelOutput(logits, domain_logits, permutation, lam)
+         
+ class Identity(nn.Module): # utility for deleting layers
+     def __init__(self):
+diff --git a/options.py b/options.py
+index 5d90189..14e7010 100644
+--- a/options.py
++++ b/options.py
+@@ -5,7 +5,7 @@ def get_opts():
+ 
+     # data
+     psr.add_argument("--dataset", required=True, type=str, choices=['camelyon17', 'iwildcam'])
+-
++    psr.add_argument("--data-root", required=True, type=str)
+     # training
+     psr.add_argument("--model-name", type=str, required=True)
+     psr.add_argument("--batch-size", default=16, type=int)
+@@ -14,6 +14,7 @@ def get_opts():
+ 
+     # checkpointing
+     psr.add_argument("--save-every", default=5, type=int)
++    psr.add_argument("--run-name", type=str, required=True)
+ 
+     # debugging
+     psr.add_argument("--max-val-batches", default=-1, type=int)
+diff --git a/requirements.txt b/requirements.txt
+index ed72246..642aa3c 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -1,4 +1,6 @@
+ wilds==1.1.0
++wandb==0.10.30
++numpy
+ 
+ -f https://download.pytorch.org/whl/torch_stable.html
+ torch==1.8.1
