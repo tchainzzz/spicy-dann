@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 import torchvision.transforms as transforms
 import torch.nn.functional as F
@@ -37,6 +38,9 @@ logger.debug(f"Logging to {logfile}")
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
+np.random.seed(42)
+torch.manual_seed(42)
+
 def build_model(name, num_classes, num_domains, domain_task_weight, mixup_param):
     model = DeepDANN(name, num_classes, num_domains, alpha=domain_task_weight,
         beta=mixup_param, device='cuda' if torch.cuda.is_available() else 'cpu')
@@ -53,7 +57,6 @@ def get_split(dataset, split_name, transforms=None):
 def train_step(iteration, model, train_loader, grouper, loss_class, loss_domain, optimizer, device, limit_batches=-1, binary=False):
     model.train()
     all_class_true, all_class_logits, all_domain_true, all_domain_logits = [], [], [], []
-    optimizer.zero_grad()
     pbar = tqdm(train_loader)
     pbar.set_description(f"Epoch {iteration+1}")
     for i, (x, y_true, metadata) in enumerate(pbar):
@@ -72,13 +75,14 @@ def train_step(iteration, model, train_loader, grouper, loss_class, loss_domain,
             domain_true[raw_metadata == old] = new
         
         output = model(x) #TODO: apply mixup, but only to the domain reps?
-        #mixup_criterion(loss_domain, all_domain_pred, all_metadata, output.permutation, output.lam)
+        #mixup_criterion(loss_domain, output.domain_logits, F.one_hot(domain_true), output.permutation, output.lam)
         err_class = loss_class(output.logits, y_true)
         err_domain = loss_domain(output.domain_logits, F.one_hot(domain_true))
         err = err_class + err_domain
         losses = {"cls/loss": err_class.item(), "dom/loss": err_domain.item(), "loss": err.item()}
         log('train', losses)
 
+        optimizer.zero_grad()
         err.backward()
         optimizer.step()
         all_class_true += y_true
@@ -91,7 +95,7 @@ def train_step(iteration, model, train_loader, grouper, loss_class, loss_domain,
         train_metrics = compute_metrics(y_true, class_preds, domain_true, domain_preds, binary=binary)
         log('train', train_metrics)
         logger.debug(f"Logging validation metrics for epoch {iteration+1}, batch {i+1} of {len(train_loader)}: {dict_formatter(train_metrics)}")
-        pbar.set_postfix(train_metrics)
+        pbar.set_postfix({"cls/loss": losses["cls/loss"], "dom/loss": losses["dom/loss"], "cls/acc": train_metrics["cls/acc"], "dom/acc": train_metrics["dom/acc"]})
     return all_class_true, all_class_logits, all_domain_true, all_domain_logits
 
 
@@ -101,7 +105,9 @@ def train(train_loader, val_loader, model, grouper, n_epochs, device='cuda' if t
     loss_class = torch.nn.CrossEntropyLoss()
     loss_domain = DenseCrossEntropyLoss()
     #optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-    optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9, weight_decay=0.01)
+    # optimizer = torch.optim.Adam(model.parameters(), lr=3e-5)
+    logger.info(f"Optimizer:\n{optimizer}")
     #
     for p in model.parameters():
         p.requires_grad = True
@@ -161,7 +167,7 @@ def evaluate(iteration, val_loader, model, grouper, device, limit_batches=-1, bi
         pbar.set_description(f"Validating epoch {iteration+1}")
         for i, (x, y_true, metadata) in enumerate(pbar):
             x = x.to(device)
-            y_true = y_ture.to(device)
+            y_true = y_true.to(device)
             if i == limit_batches:
                 logger.warning(f"limit_batches set to {limit_batches}; early exit")
                 break
@@ -210,20 +216,28 @@ METADATA_KEYS = { # what domain SHIFT are we trying to model?
     "iwildcam": "location"
 }
 
-DEFAULT_TRANSFORM = transforms.Compose(
-    [
-        transforms.Resize((224, 224)),
-        transforms.ToTensor()
-    ]
-)
+DEFAULT_TRANSFORM = {
+    "camelyon17": transforms.Compose(
+        [
+            transforms.Resize((96, 96)),
+            transforms.ToTensor()
+        ]
+    ),
+    "iwildcam": transforms.Compose(
+        [
+            transforms.Resize((448, 448)),
+            transforms.ToTensor()
+        ]
+    )
+}
 
 if __name__ == '__main__':
     opts = options.get_opts()
     logger.info(f"Options:\n{options.prettyprint(opts)}")
     print(f"Loading dataset {opts.dataset} from {opts.data_root}")
     dataset = get_wilds_dataset(opts.dataset, opts.data_root)
-    train_data = get_split(dataset, 'train', transforms=DEFAULT_TRANSFORM)
-    val_data = get_split(dataset, 'test', transforms=DEFAULT_TRANSFORM)
+    train_data = get_split(dataset, 'train', transforms=DEFAULT_TRANSFORM[opts.dataset])
+    val_data = get_split(dataset, 'test', transforms=DEFAULT_TRANSFORM[opts.dataset])
 
     grouper = CombinatorialGrouper(dataset, [METADATA_KEYS[opts.dataset]])
     train_loader = get_train_loader('group', train_data, batch_size=opts.batch_size, grouper=grouper, n_groups_per_batch=min(opts.batch_size, NUM_DOMAINS[opts.dataset]))

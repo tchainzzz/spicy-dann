@@ -66,6 +66,7 @@ class DeepDANN(nn.Module):
         if self.training:
             domain_logits, permutation, lam = self.domain_discriminator(feats)
             return MixupModelOutput(logits, domain_logits, permutation, lam)
+            #return MixupModelOutput(logits, torch.ones(X.size(0), 3).cuda(), None, 1)
         else:
             return MixupModelOutput(logits)
 class Identity(nn.Module): # utility for deleting layers
