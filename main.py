@@ -93,8 +93,9 @@ def train_step(iteration, model, train_loader, grouper, loss_class, loss_domain,
 
         class_preds = torch.max(output.logits, dim=-1).indices
         domain_preds = torch.max(output.domain_logits, dim=-1).indices
-        train_metrics = compute_metrics(y_true, class_preds, domain_true, domain_preds, binary=binary)
-        log('train', train_metrics)
+        if i % 10 == 0: # inefficient - GPU to CPU transfer
+            train_metrics = compute_metrics(y_true, class_preds, domain_true, domain_preds, binary=binary)
+            log('train', train_metrics)
         logger.debug(f"Logging validation metrics for epoch {iteration+1}, batch {i+1} of {len(train_loader)}: {dict_formatter(train_metrics)}")
         pbar.set_postfix({"cls/loss": losses["cls/loss"], "dom/loss": losses["dom/loss"], "cls/acc": train_metrics["cls/acc"], "dom/acc": train_metrics["dom/acc"]})
     return all_class_true, all_class_logits, all_domain_true, all_domain_logits
@@ -243,8 +244,8 @@ if __name__ == '__main__':
     val_data = get_split(dataset, 'test', transforms=DEFAULT_TRANSFORM[opts.dataset])
 
     grouper = CombinatorialGrouper(dataset, [METADATA_KEYS[opts.dataset]])
-    train_loader = get_train_loader('group', train_data, batch_size=opts.batch_size, grouper=grouper, n_groups_per_batch=min(opts.batch_size, NUM_DOMAINS[opts.dataset]))
-    val_loader = get_eval_loader('standard', val_data, batch_size=opts.batch_size) # we don't care about test-time domain class.
+    train_loader = get_train_loader('group', train_data, batch_size=opts.batch_size, grouper=grouper, n_groups_per_batch=min(opts.batch_size, NUM_DOMAINS[opts.dataset]), num_workers=4, pin_memory=True)
+    val_loader = get_eval_loader('standard', val_data, batch_size=opts.batch_size, num_workers=4, pin_memory=True) # we don't care about test-time domain class.
     
     assert train_loader is not None
     assert val_loader is not None
