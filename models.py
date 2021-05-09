@@ -40,23 +40,23 @@ class MixUpDomainClassifier(nn.Module):
         return X, permutation, lam
 
 class DeepDANN(nn.Module):
-    def __init__(self, model_name, num_classes, num_domains, alpha=0.1, beta=-1, pretrained=True, *args, **kwargs):
+    def __init__(self, model_name, num_classes, num_domains, alpha=0.1, beta=-1, pretrained=True, device='cuda', *args, **kwargs):
         super().__init__(*args, **kwargs)
-        model = getattr(torchvision.models, model_name)(pretrained=pretrained)
+        model = getattr(torchvision.models, model_name)(pretrained=pretrained).to(device)
         self.alpha = alpha
         self.beta = beta
         if model_name.startswith('resnet'):
             num_ftrs = model.fc.in_features
-            self.classifier = nn.Linear(num_ftrs, num_classes)
-            model.fc = Identity()
+            self.classifier = nn.Linear(num_ftrs, num_classes).to(device)
+            model.fc = Identity().to(device)
             self.feature_extractor = model
-            self.domain_discriminator = MixUpDomainClassifier(num_ftrs, num_domains, alpha=alpha, beta=beta)
+            self.domain_discriminator = MixUpDomainClassifier(num_ftrs, num_domains, alpha=alpha, beta=beta).to(device)
         elif model_name.startswith('densenet'):
             num_ftrs = model.classifier.in_features
-            self.classifier = nn.Linear(num_ftrs, num_classes)
+            self.classifier = nn.Linear(num_ftrs, num_classes).to(device)
             model.classifier = Identity()
-            self.feature_extractor = model
-            self.domain_discriminator = MixUpDomainClassifier(num_ftrs, num_domains, alpha=alpha, beta=beta)
+            self.feature_extractor = model.to(device)
+            self.domain_discriminator = MixUpDomainClassifier(num_ftrs, num_domains, alpha=alpha, beta=beta).to(device)
         else:
             raise NotImplementedError()
 

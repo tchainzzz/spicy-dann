@@ -1,5 +1,6 @@
 import torch
 import torchvision.transforms as transforms
+import torch.nn.functional as F
 from tqdm.auto import tqdm
 import wandb
 from wilds import get_dataset
@@ -10,7 +11,7 @@ from sklearn.metrics import precision_recall_fscore_support, accuracy_score
 
 from models import DeepDANN
 import options
-from utils import dict_formatter
+from utils import dict_formatter, DenseCrossEntropyLoss
 
 import datetime
 import logging
@@ -37,8 +38,9 @@ logger.debug(f"Logging to {logfile}")
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 def build_model(name, num_classes, num_domains, domain_task_weight, mixup_param):
-    model = DeepDANN(name, num_classes, num_domains, alpha=domain_task_weight, beta=mixup_param)
-    return model.to(device)
+    model = DeepDANN(name, num_classes, num_domains, alpha=domain_task_weight,
+        beta=mixup_param, device='cuda' if torch.cuda.is_available() else 'cpu')
+    return model
 
 def get_wilds_dataset(name, data_root):
     dataset = get_dataset(dataset=name, root_dir=data_root, download=False)
@@ -46,25 +48,25 @@ def get_wilds_dataset(name, data_root):
     return dataset
 
 def get_split(dataset, split_name, transforms=None):
-    # split name is train, val, or test
-    #if split_name == 'test':
-    #    assert False, "Hi! You just tried to load a test split. This line of code is here to prevent you from shooting yourself in the foot. Comment this out to run on test."
     return dataset.get_subset(split_name, transform=transforms)
-def train_step(iteration, model, train_loader, grouper, loss_class, loss_domain, optimizer, limit_batches=-1, binary=False):
+
+def train_step(iteration, model, train_loader, grouper, loss_class, loss_domain, optimizer, device, limit_batches=-1, binary=False):
     model.train()
     all_class_true, all_class_logits, all_domain_true, all_domain_logits = [], [], [], []
     optimizer.zero_grad()
     pbar = tqdm(train_loader)
     pbar.set_description(f"Epoch {iteration+1}")
     for i, (x, y_true, metadata) in enumerate(pbar):
+        x = x.to(device)
+        y_true = y_true.to(device)
         if i == limit_batches:
             logger.warning(f"limit_batches set to {limit_batches}; early exit")
             break
         x = x.to(device)
         y_true = y_true.to(device)
-        raw_metadata = grouper.metadata_to_group(metadata).to(device)
+        raw_metadata = grouper.metadata_to_group(metadata)
         raw_domain = torch.unique(raw_metadata)
-        domain_values = raw_domain.topk(raw_domain.numel()).indices # all domain labels are unique and can be deterministically ordered, so use topk
+        domain_values = raw_domain.topk(raw_domain.numel()).indices.to(device) # all domain labels are unique and can be deterministically ordered, so use topk
         domain_true = torch.zeros_like(y_true).to(device)
         for old, new in zip(raw_domain, domain_values):
             domain_true[raw_metadata == old] = new
@@ -72,7 +74,7 @@ def train_step(iteration, model, train_loader, grouper, loss_class, loss_domain,
         output = model(x) #TODO: apply mixup, but only to the domain reps?
         #mixup_criterion(loss_domain, all_domain_pred, all_metadata, output.permutation, output.lam)
         err_class = loss_class(output.logits, y_true)
-        err_domain = loss_domain(output.domain_logits, domain_true)
+        err_domain = loss_domain(output.domain_logits, F.one_hot(domain_true))
         err = err_class + err_domain
         losses = {"cls/loss": err_class.item(), "dom/loss": err_domain.item(), "loss": err.item()}
         log('train', losses)
@@ -93,10 +95,11 @@ def train_step(iteration, model, train_loader, grouper, loss_class, loss_domain,
     return all_class_true, all_class_logits, all_domain_true, all_domain_logits
 
 
-def train(train_loader, val_loader, model, grouper, n_epochs, get_train_metrics=True, save_every=5, max_val_batches=100, binary=False):
+def train(train_loader, val_loader, model, grouper, n_epochs, device='cuda' if torch.cuda.is_available() else 'cpu',
+    get_train_metrics=True, save_every=5, max_val_batches=100, binary=False):
     # define loss function and optimizer # TODO: command-line-ify this
-    loss_class = torch.nn.NLLLoss()
-    loss_domain = torch.nn.NLLLoss()
+    loss_class = torch.nn.CrossEntropyLoss()
+    loss_domain = DenseCrossEntropyLoss()
     #optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
     #
@@ -107,8 +110,10 @@ def train(train_loader, val_loader, model, grouper, n_epochs, get_train_metrics=
     for i in range(n_epochs):
         all_class_true, all_class_pred, all_domain_true, all_domain_pred = train_step(i,
             model, train_loader, grouper,
-            loss_class, loss_domain, optimizer, limit_batches=max_val_batches, binary=binary)
-        val_metrics = evaluate(i, val_loader, model, grouper, limit_batches=max_val_batches, binary=binary)
+            loss_class, loss_domain, optimizer, device,
+            limit_batches=max_val_batches, binary=binary)
+        val_metrics = evaluate(i, val_loader, model, grouper, device,
+            limit_batches=max_val_batches, binary=binary)
         log('val', val_metrics)
         print(f"Validation metrics: {dict_formatter(val_metrics)}")
         logger.debug(f"Logging validation metrics for epoch {i+1}: {dict_formatter(val_metrics)}")
@@ -145,7 +150,7 @@ def compute_metrics(all_class_true, all_class_pred, all_domain_true=None, all_do
         metrics.update(domain_metrics)
     return metrics
 
-def evaluate(iteration, val_loader, model, grouper, limit_batches=-1, binary=False):
+def evaluate(iteration, val_loader, model, grouper, device, limit_batches=-1, binary=False):
     all_class_true, all_class_pred = [], []
 
     loss_class = torch.nn.NLLLoss()
@@ -155,6 +160,8 @@ def evaluate(iteration, val_loader, model, grouper, limit_batches=-1, binary=Fal
         pbar = tqdm(val_loader)
         pbar.set_description(f"Validating epoch {iteration+1}")
         for i, (x, y_true, metadata) in enumerate(pbar):
+            x = x.to(device)
+            y_true = y_ture.to(device)
             if i == limit_batches:
                 logger.warning(f"limit_batches set to {limit_batches}; early exit")
                 break
