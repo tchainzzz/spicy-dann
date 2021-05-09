@@ -1,5 +1,6 @@
 WILDS/*
 logs/*
 __pycache__/
+models/*
 
 *.*.sw*

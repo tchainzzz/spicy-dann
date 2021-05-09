@@ -1,13 +1,14 @@
 import torch
 from tqdm.auto import tqdm
+import wandb
 from wilds import get_dataset
 
 from models import DeepDANN
-
 import options
 
 import datetime
 import logging
+import os
 import time
 logger = logging.getLogger(__file__)
 logger.setLevel(logging.DEBUG)
@@ -50,21 +51,30 @@ def train_step(iteration, model, train_loader, limit_batches=-1):
         if i == limit_batches:
             logger.warn(f"limit_batches set to {limit_batches}; early exit")
             break
-        y_pred = model(x) #TODO: apply mixup, but only to the domain reps?
+        output = model(x)        
+        # opt.zero_grad()
+        # loss = mixup_criterion(loss_fn, output.domain_logits, metadata, permutation, lam) + crietrion(output.logits, y_true)
+        # loss.backward()
+        # optimizer.step()
+        # wandb.log({"train_loss": loss})
         all_y_true += y_true
-        all_y_pred += y_pred
+        all_y_pred += output.logits
         all_metadata += metadata
     return all_y_true, all_y_pred, all_metadata
 
-def train(train_loader, val_loader, model, n_epochs, get_train_metrics=True, save_every=5, max_val_batches=100):
+def train(train_loader, val_loader, model, n_epochs, get_train_metrics=True, save_every=5, max_val_batches=100, run_name=""):
     metrics = []
     for i in range(n_epochs):
         y_true, y_pred, metadata = train_step(i, model, train_loader)
+        # calculate loss stuff and log
+        # wandb.log(*)
         if get_train_metrics:
             train_metrics = dataset.eval(y_pred, y_true, metadata, limit_batches=max_val_batches)
+        
         val_metrics = evaluate(i, model, val_loader, limit_batches=max_val_batches)
         if i % save_every == 0:
-            torch.save() # TODO
+            torch.save(model.state_dict(), "./models/{run_name}_ep{i}_{human_readable_time}.ckpt")
+        # scheduler.step()?
         metrics.append(val_metrics if not get_train_metrics else (train_metrics, val_metrics))
     return metrics
 
@@ -81,15 +91,17 @@ def evaluate(iteration, model, val_loader, limit_batches=-1):
         all_y_pred += y_pred
         all_metadata += metadata
     metrics = dataset.eval(all_y_pred, all_y_true, all_metadata)
+    # calculate loss stuff and log
+    # wandb.log(*)
     return metrics
 
 NUM_CLASSES = {
     "camelyon17": 2,
-    "iwildcam": 10
+    "iwildcam": 182
 }
 NUM_DOMAINS = {
     "camelyon17": 3,
-    "iwildcam": 10
+    "iwildcam": 243
 }
 
 if __name__ == '__main__':
@@ -98,5 +110,8 @@ if __name__ == '__main__':
     dataset = get_wilds_dataset(opts.dataset)
     train_loader, val_loader = get_split(dataset, 'train'), get_split(dataset, 'val')
     model = build_model(opts.model_name, NUM_CLASSES[opts.dataset], NUM_DOMAINS[opts.dataset])
-    metrics = train(train_loader, val_loader, model, opts.n_epochs, get_train_metrics=opts.get_train_metrics, save_every=opts.save_every, max_val_batches=opts.max_val_batches)
 
+    wandb.init(project='deep-domain-mixup', entity='tchainzzz')
+    wandb.config.update(vars(opts))
+    metrics = train(train_loader, val_loader, model, opts.n_epochs, get_train_metrics=opts.get_train_metrics, save_every=opts.save_every, max_val_batches=opts.max_val_batches)
+    torch.save(model.state_dict(), "./models/{opts.run_name}_final_{human_readable_time}.pth")

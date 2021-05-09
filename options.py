@@ -14,6 +14,7 @@ def get_opts():
 
     # checkpointing
     psr.add_argument("--save-every", default=5, type=int)
+    psr.add_argument("--run-name", type=str, required=True)
 
     # debugging
     psr.add_argument("--max-val-batches", default=-1, type=int)
