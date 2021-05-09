@@ -1,5 +1,9 @@
 WILDS/*
 logs/*
 __pycache__/
+models/*
+.idea/
+wandb/
+
 
 *.*.sw*

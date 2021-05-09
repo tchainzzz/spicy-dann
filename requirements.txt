@@ -1,4 +1,6 @@
 wilds==1.1.0
+wandb==0.10.30
+numpy
 
 -f https://download.pytorch.org/whl/torch_stable.html
 torch==1.8.1

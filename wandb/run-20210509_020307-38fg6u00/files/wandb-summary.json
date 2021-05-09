@@ -1,0 +1,1 @@
+{"train/class/acc": 0.3333333333333333, "_runtime": 12, "_timestamp": 1620550999, "_step": 15, "train/domain/acc": 0.3333333333333333, "train/class/precision": 0.5, "train/class/recall": 0.5, "train/class/f1": 0.5, "train/domain/precision": 0.25, "train/domain/recall": 0.25, "train/domain/f1": 0.25}

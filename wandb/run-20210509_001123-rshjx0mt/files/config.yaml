@@ -1,0 +1,47 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.10.30
+    code_path: code/main.py
+    framework: torch
+    is_jupyter_run: false
+    is_kaggle_kernel: true
+    python_version: 3.7.10
+    t:
+      1:
+      - 1
+      - 5
+      4: 3.7.10
+      5: 0.10.30
+      8:
+      - 2
+      - 5
+batch_size:
+  desc: null
+  value: 16
+data_root:
+  desc: null
+  value: ./WILDS
+dataset:
+  desc: null
+  value: camelyon17
+get_train_metrics:
+  desc: null
+  value: true
+max_val_batches:
+  desc: null
+  value: 5
+model_name:
+  desc: null
+  value: resnet18
+n_epochs:
+  desc: null
+  value: 1
+run_name:
+  desc: null
+  value: dev-small
+save_every:
+  desc: null
+  value: 5

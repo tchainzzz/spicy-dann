@@ -1,0 +1,86 @@
+2021-05-09 01:12:45,001 INFO    MainThread:24023 [internal.py:wandb_internal():91] W&B internal server running at pid: 24023, started at: 2021-05-09 01:12:45.001352
+2021-05-09 01:12:45,007 INFO    WriterThread:24023 [datastore.py:open_for_write():77] open: /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/run-3vmrua9r.wandb
+2021-05-09 01:12:45,008 DEBUG   HandlerThread:24023 [handler.py:handle_request():121] handle_request: check_version
+2021-05-09 01:12:45,009 DEBUG   SenderThread:24023 [sender.py:send():176] send: header
+2021-05-09 01:12:45,009 DEBUG   SenderThread:24023 [sender.py:send_request():186] send_request: check_version
+2021-05-09 01:12:45,089 DEBUG   SenderThread:24023 [sender.py:send():176] send: run
+2021-05-09 01:12:45,246 INFO    SenderThread:24023 [dir_watcher.py:__init__():168] watching files in: /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files
+2021-05-09 01:12:45,246 INFO    SenderThread:24023 [sender.py:_start_run_threads():699] run started: 3vmrua9r with start time 1620547964
+2021-05-09 01:12:45,255 DEBUG   SenderThread:24023 [sender.py:send():176] send: summary
+2021-05-09 01:12:45,256 INFO    SenderThread:24023 [sender.py:_save_file():821] saving file wandb-summary.json with policy end
+2021-05-09 01:12:45,258 DEBUG   HandlerThread:24023 [handler.py:handle_request():121] handle_request: run_start
+2021-05-09 01:12:45,330 DEBUG   HandlerThread:24023 [meta.py:__init__():39] meta init
+2021-05-09 01:12:45,331 DEBUG   HandlerThread:24023 [meta.py:__init__():53] meta init done
+2021-05-09 01:12:45,331 DEBUG   HandlerThread:24023 [meta.py:probe():210] probe
+2021-05-09 01:12:45,333 DEBUG   HandlerThread:24023 [meta.py:_setup_git():200] setup git
+2021-05-09 01:12:45,346 DEBUG   HandlerThread:24023 [meta.py:_setup_git():207] setup git done
+2021-05-09 01:12:45,346 DEBUG   HandlerThread:24023 [meta.py:_save_code():89] save code
+2021-05-09 01:12:45,352 DEBUG   HandlerThread:24023 [meta.py:_save_code():110] save code done
+2021-05-09 01:12:45,352 DEBUG   HandlerThread:24023 [meta.py:_save_patches():127] save patches
+2021-05-09 01:12:45,404 DEBUG   HandlerThread:24023 [meta.py:_save_patches():169] save patches done
+2021-05-09 01:12:45,404 DEBUG   HandlerThread:24023 [meta.py:_save_pip():57] save pip
+2021-05-09 01:12:45,405 DEBUG   HandlerThread:24023 [meta.py:_save_pip():71] save pip done
+2021-05-09 01:12:45,405 DEBUG   HandlerThread:24023 [meta.py:_save_conda():78] save conda
+2021-05-09 01:12:46,249 INFO    Thread-8  :24023 [dir_watcher.py:_on_file_created():216] file/dir created: /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files/requirements.txt
+2021-05-09 01:12:46,250 INFO    Thread-8  :24023 [dir_watcher.py:_on_file_created():216] file/dir created: /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files/wandb-summary.json
+2021-05-09 01:12:46,250 INFO    Thread-8  :24023 [dir_watcher.py:_on_file_created():216] file/dir created: /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files/code/main.py
+2021-05-09 01:12:46,250 INFO    Thread-8  :24023 [dir_watcher.py:_on_file_created():216] file/dir created: /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files/diff.patch
+2021-05-09 01:12:46,251 INFO    Thread-8  :24023 [dir_watcher.py:_on_file_created():216] file/dir created: /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files/upstream_diff_23cf4f99936b875043c051d399258e78c9a222c7.patch
+2021-05-09 01:12:46,251 INFO    Thread-8  :24023 [dir_watcher.py:_on_file_created():216] file/dir created: /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files/conda-environment.yaml
+2021-05-09 01:12:46,251 INFO    Thread-8  :24023 [dir_watcher.py:_on_file_created():216] file/dir created: /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files/code
+2021-05-09 01:12:47,662 DEBUG   HandlerThread:24023 [meta.py:_save_conda():86] save conda done
+2021-05-09 01:12:47,662 DEBUG   HandlerThread:24023 [meta.py:probe():252] probe done
+2021-05-09 01:12:47,665 DEBUG   SenderThread:24023 [sender.py:send():176] send: files
+2021-05-09 01:12:47,666 INFO    SenderThread:24023 [sender.py:_save_file():821] saving file wandb-metadata.json with policy now
+2021-05-09 01:12:47,666 INFO    SenderThread:24023 [sender.py:_save_file():821] saving file code/main.py with policy now
+2021-05-09 01:12:47,667 INFO    SenderThread:24023 [sender.py:_save_file():821] saving file diff.patch with policy now
+2021-05-09 01:12:47,668 INFO    SenderThread:24023 [sender.py:_save_file():821] saving file upstream_diff_23cf4f99936b875043c051d399258e78c9a222c7.patch with policy now
+2021-05-09 01:12:47,680 DEBUG   HandlerThread:24023 [handler.py:handle_request():121] handle_request: stop_status
+2021-05-09 01:12:47,681 DEBUG   SenderThread:24023 [sender.py:send_request():186] send_request: stop_status
+2021-05-09 01:12:47,791 DEBUG   SenderThread:24023 [sender.py:send():176] send: config
+2021-05-09 01:12:48,049 INFO    Thread-13 :24023 [upload_job.py:push():133] Uploaded file /tmp/tmpt3xmcdg1wandb/eicdszsd-diff.patch
+2021-05-09 01:12:48,071 INFO    Thread-14 :24023 [upload_job.py:push():133] Uploaded file /tmp/tmpt3xmcdg1wandb/2d0bf8dh-upstream_diff_23cf4f99936b875043c051d399258e78c9a222c7.patch
+2021-05-09 01:12:48,082 INFO    Thread-11 :24023 [upload_job.py:push():133] Uploaded file /tmp/tmpt3xmcdg1wandb/3if3ozw0-wandb-metadata.json
+2021-05-09 01:12:48,247 INFO    Thread-8  :24023 [dir_watcher.py:_on_file_modified():229] file/dir modified: /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files/conda-environment.yaml
+2021-05-09 01:12:48,248 INFO    Thread-8  :24023 [dir_watcher.py:_on_file_created():216] file/dir created: /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files/output.log
+2021-05-09 01:12:48,248 INFO    Thread-8  :24023 [dir_watcher.py:_on_file_created():216] file/dir created: /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files/wandb-metadata.json
+2021-05-09 01:12:49,248 INFO    Thread-8  :24023 [dir_watcher.py:_on_file_modified():229] file/dir modified: /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files/config.yaml
+2021-05-09 01:12:53,185 INFO    Thread-12 :24023 [upload_job.py:push():133] Uploaded file /tmp/tmpt3xmcdg1wandb/3olwubkg-code/main.py
+2021-05-09 01:13:02,794 DEBUG   HandlerThread:24023 [handler.py:handle_request():121] handle_request: stop_status
+2021-05-09 01:13:02,794 DEBUG   SenderThread:24023 [sender.py:send_request():186] send_request: stop_status
+2021-05-09 01:13:13,411 DEBUG   SenderThread:24023 [sender.py:send():176] send: stats
+2021-05-09 01:13:17,905 DEBUG   HandlerThread:24023 [handler.py:handle_request():121] handle_request: stop_status
+2021-05-09 01:13:17,905 DEBUG   SenderThread:24023 [sender.py:send_request():186] send_request: stop_status
+2021-05-09 01:13:33,053 DEBUG   HandlerThread:24023 [handler.py:handle_request():121] handle_request: stop_status
+2021-05-09 01:13:33,053 DEBUG   SenderThread:24023 [sender.py:send_request():186] send_request: stop_status
+2021-05-09 01:13:43,513 DEBUG   SenderThread:24023 [sender.py:send():176] send: stats
+2021-05-09 01:13:48,169 DEBUG   HandlerThread:24023 [handler.py:handle_request():121] handle_request: stop_status
+2021-05-09 01:13:48,169 DEBUG   SenderThread:24023 [sender.py:send_request():186] send_request: stop_status
+2021-05-09 01:14:03,276 DEBUG   HandlerThread:24023 [handler.py:handle_request():121] handle_request: stop_status
+2021-05-09 01:14:03,278 DEBUG   SenderThread:24023 [sender.py:send_request():186] send_request: stop_status
+2021-05-09 01:14:13,586 DEBUG   SenderThread:24023 [sender.py:send():176] send: stats
+2021-05-09 01:14:18,382 DEBUG   HandlerThread:24023 [handler.py:handle_request():121] handle_request: stop_status
+2021-05-09 01:14:18,382 DEBUG   SenderThread:24023 [sender.py:send_request():186] send_request: stop_status
+2021-05-09 01:14:21,148 WARNING MainThread:24023 [internal.py:wandb_internal():147] Internal process interrupt: 1
+2021-05-09 01:14:21,292 WARNING MainThread:24023 [internal.py:wandb_internal():147] Internal process interrupt: 2
+2021-05-09 01:14:21,292 ERROR   MainThread:24023 [internal.py:wandb_internal():150] Internal process interrupted.
+2021-05-09 01:14:22,036 INFO    WriterThread:24023 [datastore.py:close():258] close: /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/run-3vmrua9r.wandb
+2021-05-09 01:14:22,036 INFO    SenderThread:24023 [sender.py:finish():925] shutting down sender
+2021-05-09 01:14:22,036 INFO    SenderThread:24023 [dir_watcher.py:finish():282] shutting down directory watcher
+2021-05-09 01:14:22,266 INFO    SenderThread:24023 [dir_watcher.py:finish():312] scan: /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files
+2021-05-09 01:14:22,267 INFO    SenderThread:24023 [dir_watcher.py:finish():318] scan save: /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files/output.log output.log
+2021-05-09 01:14:22,267 INFO    SenderThread:24023 [dir_watcher.py:finish():318] scan save: /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files/conda-environment.yaml conda-environment.yaml
+2021-05-09 01:14:22,267 INFO    SenderThread:24023 [dir_watcher.py:finish():318] scan save: /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files/config.yaml config.yaml
+2021-05-09 01:14:22,268 INFO    SenderThread:24023 [dir_watcher.py:finish():318] scan save: /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files/upstream_diff_23cf4f99936b875043c051d399258e78c9a222c7.patch upstream_diff_23cf4f99936b875043c051d399258e78c9a222c7.patch
+2021-05-09 01:14:22,268 INFO    SenderThread:24023 [dir_watcher.py:finish():318] scan save: /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files/diff.patch diff.patch
+2021-05-09 01:14:22,268 INFO    SenderThread:24023 [dir_watcher.py:finish():318] scan save: /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files/wandb-metadata.json wandb-metadata.json
+2021-05-09 01:14:22,268 INFO    SenderThread:24023 [dir_watcher.py:finish():318] scan save: /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files/requirements.txt requirements.txt
+2021-05-09 01:14:22,268 INFO    SenderThread:24023 [dir_watcher.py:finish():318] scan save: /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files/wandb-summary.json wandb-summary.json
+2021-05-09 01:14:22,269 INFO    SenderThread:24023 [dir_watcher.py:finish():318] scan save: /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files/code/main.py code/main.py
+2021-05-09 01:14:22,274 INFO    SenderThread:24023 [file_pusher.py:finish():176] shutting down file pusher
+2021-05-09 01:14:22,278 INFO    SenderThread:24023 [file_pusher.py:join():181] waiting for file pusher
+2021-05-09 01:14:22,664 INFO    Thread-15 :24023 [upload_job.py:push():133] Uploaded file /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files/conda-environment.yaml
+2021-05-09 01:14:22,689 INFO    Thread-17 :24023 [upload_job.py:push():133] Uploaded file /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files/requirements.txt
+2021-05-09 01:14:22,709 INFO    Thread-16 :24023 [upload_job.py:push():133] Uploaded file /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files/config.yaml
+2021-05-09 01:14:22,712 INFO    Thread-18 :24023 [upload_job.py:push():133] Uploaded file /home/trenton-windows/repos/spicy-dann/wandb/run-20210509_011244-3vmrua9r/files/wandb-summary.json
+2021-05-09 01:14:23,444 INFO    MainThread:24023 [internal.py:handle_exit():78] Internal process exited

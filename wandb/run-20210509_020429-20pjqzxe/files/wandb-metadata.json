@@ -1,0 +1,38 @@
+{
+    "os": "Linux-5.10.16.3-microsoft-standard-WSL2-x86_64-with-debian-buster-sid",
+    "python": "3.7.10",
+    "heartbeatAt": "2021-05-09T09:04:30.061625",
+    "startedAt": "2021-05-09T09:04:29.147214",
+    "docker": null,
+    "cpu_count": 4,
+    "cuda": "11.0.228",
+    "args": [
+        "--n-epochs",
+        "2",
+        "--get-train-metrics",
+        "--max-val-batches",
+        "2",
+        "--dataset",
+        "camelyon17",
+        "--model-name",
+        "resnet18",
+        "--run-name",
+        "dev-small",
+        "--data-root",
+        "./WILDS",
+        "--batch-size",
+        "3"
+    ],
+    "state": "running",
+    "program": "main.py",
+    "codePath": "main.py",
+    "git": {
+        "remote": "git@github.com:tchainzzz/spicy-dann.git",
+        "commit": "826e7816e397cd4ff4f8427e963c7d015029cb01"
+    },
+    "email": "tchang97@cs.stanford.edu",
+    "root": "/home/trenton-windows/repos/spicy-dann",
+    "host": "DESKTOP-979T76L",
+    "username": "trenton-windows",
+    "executable": "/home/trenton-windows/miniconda3/envs/wilds/bin/python"
+}
