@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 
+import ast
+
 class DenseCrossEntropyLoss(nn.Module):
     def __init__(self, dim=-1, weight=None, reduction='mean'):
         super(DenseCrossEntropyLoss, self).__init__()
@@ -21,3 +23,16 @@ class DenseCrossEntropyLoss(nn.Module):
 
 def dict_formatter(d, delimiter=":", joiner="-"):
     return f" {joiner} ".join([f"{k}{delimiter} {v:.4f}" for k, v in d.items()])
+
+
+def parse_argdict(argdict):
+    result = {}
+    for kv in argdict:
+        key, val = kv.split("=")
+        try:
+            result[key] = ast.literal_eval(val)
+        except ValueError:
+            result[key] = str(val)
+    return result
+
+
