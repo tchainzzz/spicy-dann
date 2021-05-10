@@ -60,6 +60,7 @@ def train_step(iteration, model, train_loader, grouper, loss_class, loss_domain,
     all_class_true, all_class_logits, all_domain_true, all_domain_logits = [], [], [], []
     pbar = tqdm(train_loader)
     pbar.set_description(f"Epoch {iteration+1}")
+    domain_to_index_map = dict(enumerate(np.unique(train_loader.dataset.metadata_array[:, 0])))
     for i, (x, y_true, metadata) in enumerate(pbar):
         x = x.to(device)
         y_true = y_true.to(device)
@@ -69,10 +70,11 @@ def train_step(iteration, model, train_loader, grouper, loss_class, loss_domain,
         x = x.to(device)
         y_true = y_true.to(device)
         raw_metadata = grouper.metadata_to_group(metadata)
-        raw_domain = torch.unique(raw_metadata)
-        domain_values = raw_domain.topk(raw_domain.numel()).indices.to(device) # all domain labels are unique and can be deterministically ordered, so use topk
+        #raw_domain = torch.unique(raw_metadata)
+        #domain_values = raw_domain.topk(raw_domain.numel(), ).indices.to(device) # all domain labels are unique and can be deterministically ordered, so use topk
+        import pdb; pdb.set_trace()
         domain_true = torch.zeros_like(y_true).to(device)
-        for old, new in zip(raw_domain, domain_values):
+        for old, new in domain_to_index_map.items():
             domain_true[raw_metadata == old] = new
         
         output = model(x) #TODO: apply mixup, but only to the domain reps?
@@ -127,7 +129,7 @@ def train(train_loader, val_loader, model, grouper, n_epochs, device='cuda' if t
         logger.debug(f"Logging validation metrics for epoch {i+1}: {dict_formatter(val_metrics)}")
         metrics.append(val_metrics)
         if i % save_every == 0:
-            checkpoint_path = "./models/{run_name}_ep{i}_{human_readable_time}.ckpt"
+            checkpoint_path = f"./models/{run_name}_ep{i}_{human_readable_time}.ckpt"
             print(f"Saving checkpoint to {checkpoint_path}")
             torch.save(model.state_dict(), checkpoint_path)
     return metrics
@@ -246,7 +248,6 @@ if __name__ == '__main__':
     grouper = CombinatorialGrouper(dataset, [METADATA_KEYS[opts.dataset]])
     train_loader = get_train_loader('group', train_data, batch_size=opts.batch_size, grouper=grouper, n_groups_per_batch=min(opts.batch_size, NUM_DOMAINS[opts.dataset]), num_workers=os.cpu_count(), pin_memory=True)
     val_loader = get_eval_loader('standard', val_data, batch_size=opts.batch_size, num_workers=os.cpu_count(), pin_memory=True) # we don't care about test-time domain class.
-    
     assert train_loader is not None
     assert val_loader is not None
     print(f'Build model of type {opts.model_name}')
@@ -259,4 +260,4 @@ if __name__ == '__main__':
     metrics = train(train_loader, val_loader, model, grouper, opts.n_epochs, 
         get_train_metrics=opts.get_train_metrics, save_every=opts.save_every, 
         max_val_batches=opts.max_val_batches, binary=(opts.dataset == 'camelyon17'))
-    torch.save(model.state_dict(), "./models/{opts.run_name}_final_{human_readable_time}.pth")
+    torch.save(model.state_dict(), f"./models/{opts.run_name}_final_{human_readable_time}.pth")
