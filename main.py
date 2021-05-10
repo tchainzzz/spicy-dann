@@ -150,7 +150,7 @@ def compute_metrics(all_class_true, all_class_pred, all_domain_true=None, all_do
         all_domain_true = all_domain_true.cpu().numpy()
         all_domain_pred = all_domain_pred.cpu().numpy()
         domain_acc = accuracy_score(all_domain_true, all_domain_pred)
-        domain_prec, domain_rec, domain_f1, *_ = precision_recall_fscore_support(all_class_true, all_class_pred, average='macro')
+        domain_prec, domain_rec, domain_f1, *_ = precision_recall_fscore_support(all_domain_true, all_domain_pred, average='macro')
         domain_metrics = {
             "dom/acc": domain_acc,
             "dom/prec": domain_prec,
