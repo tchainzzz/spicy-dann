@@ -13,7 +13,7 @@ from sklearn.metrics import precision_recall_fscore_support, accuracy_score
 from models import DeepDANN
 from mixup import mixup_criterion
 import options
-from utils import dict_formatter, DenseCrossEntropyLoss
+from utils import dict_formatter, DenseCrossEntropyLoss, parse_argdict
 
 import datetime
 import logging
@@ -55,7 +55,7 @@ def get_wilds_dataset(name, data_root):
 def get_split(dataset, split_name, transforms=None):
     return dataset.get_subset(split_name, transform=transforms)
 
-def train_step(iteration, model, train_loader, grouper, loss_class, loss_domain, optimizer, device, limit_batches=-1, binary=False):
+def train_step(iteration, model, train_loader, grouper, loss_class, loss_domain, optimizer, device, limit_batches=-1, binary=False, show_metrics=["loss", "acc"]):
     model.train()
     all_class_true, all_class_logits, all_domain_true, all_domain_logits = [], [], [], []
     pbar = tqdm(train_loader)
@@ -72,15 +72,18 @@ def train_step(iteration, model, train_loader, grouper, loss_class, loss_domain,
         raw_metadata = grouper.metadata_to_group(metadata)
         #raw_domain = torch.unique(raw_metadata)
         #domain_values = raw_domain.topk(raw_domain.numel(), ).indices.to(device) # all domain labels are unique and can be deterministically ordered, so use topk
-        import pdb; pdb.set_trace()
         domain_true = torch.zeros_like(y_true).to(device)
-        for old, new in domain_to_index_map.items():
+        for new, old in domain_to_index_map.items():
             domain_true[raw_metadata == old] = new
         
         output = model(x) #TODO: apply mixup, but only to the domain reps?
         
         err_class = loss_class(output.logits, y_true)
-        err_domain = mixup_criterion(loss_domain, output.domain_logits, F.one_hot(domain_true), output.permutation, output.lam)
+        err_domain = mixup_criterion(loss_domain,
+                output.domain_logits,
+                F.one_hot(domain_true, num_classes=len(domain_to_index_map)),
+                output.permutation,
+                output.lam)
         err = err_class + err_domain
         losses = {"cls/loss": err_class.item(), "dom/loss": err_domain.item(), "loss": err.item()}
         log('train', losses)
@@ -99,18 +102,28 @@ def train_step(iteration, model, train_loader, grouper, loss_class, loss_domain,
             train_metrics = compute_metrics(y_true, class_preds, domain_true, domain_preds, binary=binary)
             log('train', train_metrics)
         logger.debug(f"Logging validation metrics for epoch {iteration+1}, batch {i+1} of {len(train_loader)}: {dict_formatter(train_metrics)}")
-        pbar.set_postfix({"cls/loss": losses["cls/loss"], "dom/loss": losses["dom/loss"], "cls/acc": train_metrics["cls/acc"], "dom/acc": train_metrics["dom/acc"]})
+        postfix_metrics = {}
+        for metric_name, value in {**losses, **train_metrics}.items():
+            subname = metric_name.split("/")[-1]
+            if subname in show_metrics:
+                postfix_metrics[metric_name] = value
+        pbar.set_postfix(postfix_metrics)
     return all_class_true, all_class_logits, all_domain_true, all_domain_logits
 
 
-def train(train_loader, val_loader, model, grouper, n_epochs, device='cuda' if torch.cuda.is_available() else 'cpu',
-    get_train_metrics=True, save_every=5, max_val_batches=100, binary=False):
+def build_optimizer(opt_name, model, **kwargs):
+    return getattr(torch.optim, opt_name)(model.parameters(), **kwargs)
+
+def train(train_loader, val_loader, model, grouper, n_epochs, opt_name, lr, opt_kwargs, 
+        run_name="", device='cuda' if torch.cuda.is_available() else 'cpu',
+    save_every=1, max_val_batches=100, binary=False, show_metrics=["loss", "acc"]):
     # define loss function and optimizer # TODO: command-line-ify this
     loss_class = torch.nn.CrossEntropyLoss()
     loss_domain = DenseCrossEntropyLoss()
     #optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-    optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9, weight_decay=0.01)
+    # optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9, weight_decay=0.01)
     # optimizer = torch.optim.Adam(model.parameters(), lr=3e-5)
+    optimizer = build_optimizer(opt_name, model, lr=lr, **opt_kwargs)
     logger.info(f"Optimizer:\n{optimizer}")
     #
     for p in model.parameters():
@@ -121,7 +134,8 @@ def train(train_loader, val_loader, model, grouper, n_epochs, device='cuda' if t
         all_class_true, all_class_pred, all_domain_true, all_domain_pred = train_step(i,
             model, train_loader, grouper,
             loss_class, loss_domain, optimizer, device,
-            limit_batches=max_val_batches, binary=binary)
+            limit_batches=max_val_batches, binary=binary,
+            show_metrics=show_metrics)
         val_metrics = evaluate(i, val_loader, model, grouper, device,
             limit_batches=max_val_batches, binary=binary)
         log('val', val_metrics)
@@ -138,7 +152,8 @@ def compute_metrics(all_class_true, all_class_pred, all_domain_true=None, all_do
     all_class_true = all_class_true.cpu().numpy()
     all_class_pred = all_class_pred.cpu().numpy()
     class_acc = accuracy_score(all_class_true, all_class_pred)
-    class_prec, class_rec, class_f1, *_ = precision_recall_fscore_support(all_class_true, all_class_pred, average='binary' if binary else 'macro')
+    class_prec, class_rec, class_f1, *_ = precision_recall_fscore_support(all_class_true, all_class_pred,
+            average='binary' if binary else 'macro', zero_division=0.)
     metrics = {
         "cls/acc": class_acc,
         "cls/prec": class_prec,
@@ -151,7 +166,8 @@ def compute_metrics(all_class_true, all_class_pred, all_domain_true=None, all_do
         all_domain_true = all_domain_true.cpu().numpy()
         all_domain_pred = all_domain_pred.cpu().numpy()
         domain_acc = accuracy_score(all_domain_true, all_domain_pred)
-        domain_prec, domain_rec, domain_f1, *_ = precision_recall_fscore_support(all_domain_true, all_domain_pred, average='macro')
+        domain_prec, domain_rec, domain_f1, *_ = precision_recall_fscore_support(all_domain_true, all_domain_pred,
+                average='binary' if binary else 'macro', zero_division=0.)
         domain_metrics = {
             "dom/acc": domain_acc,
             "dom/prec": domain_prec,
@@ -245,8 +261,8 @@ if __name__ == '__main__':
     val_data = get_split(dataset, 'test', transforms=DEFAULT_TRANSFORM[opts.dataset])
 
     grouper = CombinatorialGrouper(dataset, [METADATA_KEYS[opts.dataset]])
-    train_loader = get_train_loader('group', train_data, batch_size=opts.batch_size, grouper=grouper, n_groups_per_batch=min(opts.batch_size, NUM_DOMAINS[opts.dataset]), num_workers=os.cpu_count(), pin_memory=True)
-    val_loader = get_eval_loader('standard', val_data, batch_size=opts.batch_size, num_workers=os.cpu_count(), pin_memory=True) # we don't care about test-time domain class.
+    train_loader = get_train_loader('group', train_data, batch_size=opts.batch_size, grouper=grouper, n_groups_per_batch=min(opts.batch_size, NUM_DOMAINS[opts.dataset]), num_workers=opts.num_workers, pin_memory=True)
+    val_loader = get_eval_loader('standard', val_data, batch_size=opts.batch_size, num_workers=opts.num_workers, pin_memory=True) # we don't care about test-time domain class.
     assert train_loader is not None
     assert val_loader is not None
     print(f'Build model of type {opts.model_name}')
@@ -256,7 +272,10 @@ if __name__ == '__main__':
     wandb.init(project='deep-domain-mixup', entity='tchainzzz', name=opts.run_name)
     wandb.config.update(vars(opts))
 
-    metrics = train(train_loader, val_loader, model, grouper, opts.n_epochs, 
-        get_train_metrics=opts.get_train_metrics, save_every=opts.save_every, 
-        max_val_batches=opts.max_val_batches, binary=(opts.dataset == 'camelyon17'))
+    metrics = train(train_loader, val_loader, model, grouper, opts.n_epochs,
+        opts.opt_name, opts.lr, parse_argdict(opts.opt_kwargs),
+        run_name=opts.run_name,
+        save_every=opts.save_every, 
+        max_val_batches=opts.max_val_batches, binary=(opts.dataset == 'camelyon17'),
+        show_metrics=opts.show_metrics)
     torch.save(model.state_dict(), f"./models/{opts.run_name}_final_{human_readable_time}.pth")

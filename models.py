@@ -69,6 +69,7 @@ class DeepDANN(nn.Module):
             #return MixupModelOutput(logits, torch.ones(X.size(0), 3).cuda(), None, 1)
         else:
             return MixupModelOutput(logits)
+
 class Identity(nn.Module): # utility for deleting layers
     def __init__(self):
         super(Identity, self).__init__()
