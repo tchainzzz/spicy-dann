@@ -128,10 +128,9 @@ def train(train_loader, val_loader, model, grouper, n_epochs, device='cuda' if t
         print(f"Validation metrics: {dict_formatter(val_metrics)}")
         logger.debug(f"Logging validation metrics for epoch {i+1}: {dict_formatter(val_metrics)}")
         metrics.append(val_metrics)
-        if i % save_every == 0:
-            checkpoint_path = f"./models/{run_name}_ep{i}_{human_readable_time}.ckpt"
-            print(f"Saving checkpoint to {checkpoint_path}")
-            torch.save(model.state_dict(), checkpoint_path)
+        checkpoint_path = f"./models/{run_name}_ep{i}_{human_readable_time}.ckpt"
+        print(f"Saving checkpoint to {checkpoint_path}")
+        torch.save(model.state_dict(), checkpoint_path)
     return metrics
 
 
